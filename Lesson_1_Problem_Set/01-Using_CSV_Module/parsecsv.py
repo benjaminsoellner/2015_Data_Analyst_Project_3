@@ -24,7 +24,16 @@ def parse_file(datafile):
     name = ""
     data = []
     with open(datafile,'rb') as f:
-        pass
+        r = csv.reader(f)
+        i = 0
+        for row in r:
+            if i == 0:
+                name = row[1]
+            elif i == 1:
+                pass
+            else:
+                data = data + [row]
+            i = i+1
     # Do not change the line below
     return (name, data)
 

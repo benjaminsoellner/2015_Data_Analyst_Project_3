@@ -19,15 +19,26 @@ def open_zip(datafile):
 def parse_file(datafile):
     workbook = xlrd.open_workbook(datafile)
     sheet = workbook.sheet_by_index(0)
-    data = None
-    # YOUR CODE HERE
-    # Remember that you can use xlrd.xldate_as_tuple(sometime, 0) to convert
-    # Excel date to Python tuple of (year, month, day, hour, minute, second)
+    data = [["Station","Year","Month","Day","Hour","Max Load"]]
+    stations = ["COAST", "EAST", "FAR_WEST", "NORTH", "NORTH_C", "SOUTHERN", "SOUTH_C", "WEST"]
+    headers = {}
+    for col in range(sheet.ncols):
+        headers[sheet.cell_value(0, col)] = col
+    for header in headers:
+        if header in stations:
+            station = header
+            values = sheet.col_values(headers[station], start_rowx=1, end_rowx=sheet.nrows)
+            maxvalue = max(values)
+            maxpos   = values.index(maxvalue)
+            maxtime  = xlrd.xldate_as_tuple( sheet.cell_value(maxpos+1, headers["Hour_End"]) , 0 )
+            data = data + [[station,maxtime[0],maxtime[1],maxtime[2],maxtime[3],maxvalue]]
     return data
 
 def save_file(data, filename):
-    # YOUR CODE HERE
-
+    with open(filename, 'wb') as f:
+        w = csv.writer(f, delimiter='|')
+        for line in data:
+            w.writerow(line)
     
 def test():
     open_zip(datafile)
