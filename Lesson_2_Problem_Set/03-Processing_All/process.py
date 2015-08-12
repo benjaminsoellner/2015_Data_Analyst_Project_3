@@ -44,15 +44,41 @@ def process_file(f):
     info["courier"], info["airport"] = f[:6].split("-")
     
     with open("{}/{}".format(datadir, f), "r") as html:
-
         soup = BeautifulSoup(html)
+        flights_by_month = {}
+        for table in soup.find_all(name="table"):
+            if table.get('class') != None and table.get('class')[0] == "dataTDRight":
+                for tr in table.find_all(name="tr"):
+                    tds = tr.find_all(name="td")
+                    if ("Year" not in tds[0].text) and ("TOTAL" not in tds[0].text) and ("TOTAL" not in tds[1].text):
+                        year = int(tds[0].text)
+                        month = int(tds[1].text)
+                        domestic = int(tds[2].text.replace(",",""))
+                        international = int(tds[3].text.replace(",",""))
+                        if (year not in flights_by_month):
+                            flights_by_month[year] = {}
+                        if (month not in flights_by_month[year]):
+                            flights_by_month[year][month] = (0,0)
+                        flights_by_month[year][month] = ( domestic, international )
+
+    for year in flights_by_month:
+        for month in flights_by_month[year]:
+            (domestic, international) = flights_by_month[year][month]
+            data.append({
+                    "courier": info["courier"],
+                    "airport": info["airport"],
+                    "year": int(year),
+                    "month": int(month),
+                    "flights": {"domestic": domestic, "international": international}
+                })
+        
 
     return data
 
 
 def test():
     print "Running a simple test..."
-    open_zip(datadir)
+    #open_zip(datadir)
     files = process_all(datadir)
     data = []
     for f in files:

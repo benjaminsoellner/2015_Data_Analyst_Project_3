@@ -16,6 +16,9 @@ def extract_data(page):
             "viewstate": ""}
     with open(page, "r") as html:
         # do something here to find the necessary values
+        soup = BeautifulSoup(html)
+        data["viewstate"] = soup.find_all(id="__VIEWSTATE")[0].get('value')
+        data["eventvalidation"] = soup.find_all(id="__EVENTVALIDATION")[0].get('value')
         pass
 
     return data

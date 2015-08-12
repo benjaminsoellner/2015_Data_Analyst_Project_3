@@ -17,10 +17,13 @@ def extract_carriers(page):
     data = []
 
     with open(page, "r") as html:
-        # do something here to find the necessary values
         soup = BeautifulSoup(html)
-
-    return data
+        data = []
+        for o in soup.find_all(id="CarrierList")[0].find_all(name="option"):
+            v = o.get('value')
+            if v not in ['All', 'AllUS', 'AllForeign']:
+                data.append(v)
+        return data
 
 
 def make_request(data):
