@@ -25,12 +25,41 @@ FIELDS = ["name", "timeZone_label", "utcOffset", "homepage", "governmentType_lab
           "elevation", "maximumElevation", "minimumElevation", "populationDensity", "wgs84_pos#lat", "wgs84_pos#long", 
           "areaLand", "areaMetro", "areaUrban"]
 
+def is_float(string):
+    try:
+        float(string)
+        return True
+    except ValueError:
+        return False
+
+def is_int(string):
+    try:
+        int(string)
+        return True
+    except ValueError:
+        return False
+
 def audit_file(filename, fields):
     fieldtypes = {}
-
-    # YOUR CODE HERE
-
-
+    for f in FIELDS:
+        fieldtypes[f] = set([])
+    with open(CITIES, "r") as fi:
+        reader = csv.DictReader(fi)
+        header = reader.fieldnames
+        for r in reader:
+            if "dbpedia.org" not in r["URI"]:
+                continue
+            for f in FIELDS:
+                if r[f] == "" or r[f] == "NULL":
+                    fieldtypes[f].add(type(None))
+                elif r[f].startswith("{") or " & " in r[f]:
+                    fieldtypes[f].add(type([]))
+                elif is_int(r[f]):
+                    fieldtypes[f].add(type(1))
+                elif is_float(r[f]):
+                    fieldtypes[f].add(type(1.1))
+                else:
+                    fieldtypes[f].add(type("x"))
     return fieldtypes
 
 

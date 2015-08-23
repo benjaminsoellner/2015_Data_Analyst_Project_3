@@ -20,10 +20,12 @@ CITIES = 'cities.csv'
 
 
 def fix_name(name):
-
-    # YOUR CODE HERE
-
-    return name
+    if name == "NULL" or name == "":
+        return []
+    elif name.startswith("{") and name.endswith("}"):
+        return name[1:-1].split("|")
+    else:
+        return [name]
 
 
 def process_file(filename):

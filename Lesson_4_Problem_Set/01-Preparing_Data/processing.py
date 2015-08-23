@@ -60,10 +60,46 @@ def process_file(filename, fields):
         reader = csv.DictReader(f)
         for i in range(3):
             l = reader.next()
-
         for line in reader:
-            # YOUR CODE HERE
-            pass
+            if "dbpedia.org" not in line["URI"]:
+                continue
+            # - trim out redundant description in parenthesis from the 'rdf-schema#label' field, like "(spider)"
+            line["rdf-schema#label"] = re.match(r'^(.*?)( \([^)]+\)|)$', line["rdf-schema#label"]).group(1)
+            # - if 'name' is "NULL" or contains non-alphanumeric characters, set it to the same value as 'label'.
+            if line["name"] == "NULL" or not re.match(r'^[a-zA-Z0-9-_]*$', line["name"]):
+                line["name"] = line["rdf-schema#label"]
+            # - keys of the dictionary changed according to the mapping in FIELDS dictionary
+            for f in FIELDS:
+                if f == "synonym":
+                    # - if there is a value in 'synonym', it should be converted to an array (list)
+                    #  by stripping the "{}" characters and splitting the string on "|". Rest of the cleanup is up to you,
+                    #  eg removing "*" prefixes etc
+                    if line[f].strip() == "NULL":
+                        line[f] = None
+                    else:
+                        line[f] = parse_array(line[f])
+                else:
+                    # - if a value of a field is "NULL", convert it to None
+                    # - strip leading and ending whitespace from all fields, if there is any
+                    if line[f].strip() == "NULL":
+                        line[f] = None
+                    else:
+                        line[f] = line[f].strip()
+            item = { 'label' : line["rdf-schema#label"],
+                     'uri': line["URI"],
+                     'description': line["rdf-schema#comment"],
+                     'name': line["name"],
+                     'synonym': line["synonym"],
+                     'classification': {
+                            'family': line["family_label"],
+                            'class': line["class_label"],
+                            'phylum': line["phylum_label"],
+                            'order': line["order_label"],
+                            'kingdom': line["kingdom_label"],
+                            'genus': line["genus_label"]
+                        }
+                    }
+            data.append(item)
     return data
 
 

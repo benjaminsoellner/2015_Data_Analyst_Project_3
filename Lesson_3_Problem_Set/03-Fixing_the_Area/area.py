@@ -16,17 +16,34 @@ import codecs
 import csv
 import json
 import pprint
-
+import re
 CITIES = 'cities.csv'
 
 
 def fix_area(area):
-
-    # YOUR CODE HERE
-
-    return area
-
-
+    pprint.pprint(area)
+    regex = re.compile("^(\d+).(\d+)(?:e(\d+)|)")
+    if area.startswith("{") and area.endswith("}"):
+        most_significant_float = 0
+        most_significant_length = 0
+        for s in area[1:-1].split("|"):
+            m = regex.match(s)
+            if m != None:
+                l = len(m.group(2)) 
+                if l > most_significant_length:
+                    most_significant_length = l
+                    try:
+                        most_significant_float = float(s)
+                    except ValueError:
+                        return None
+            else:
+                return None
+        return most_significant_float
+    else:
+        try:
+            return float(area)
+        except ValueError:
+            return None
 
 def process_file(filename):
     # CHANGES TO THIS FUNCTION WILL BE IGNORED WHEN YOU SUBMIT THE EXERCISE

@@ -10,14 +10,12 @@ you have to install MongoDB (see Instructor comments for link to installation in
 and uncomment the get_db function.
 """
 
-"""
 def get_db():
     from pymongo import MongoClient
     client = MongoClient('localhost:27017')
     # 'examples' here is the database name. It will be created if it does not exist.
     db = client.examples
     return db
-"""
 
 def add_city(db):
     db.cities.insert({"name" : "Chicago"})

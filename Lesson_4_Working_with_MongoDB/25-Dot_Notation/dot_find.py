@@ -17,7 +17,7 @@ def get_db():
 
 
 def dot_query():
-    query = {}
+    query = {"dimensions.width" : {"$gt": 2.5}}
     return query
 
 

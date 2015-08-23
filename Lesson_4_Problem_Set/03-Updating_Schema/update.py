@@ -41,6 +41,7 @@ import codecs
 import csv
 import json
 import pprint
+import re
 
 DATAFILE = 'arachnid.csv'
 FIELDS ={'rdf-schema#label': 'label',
@@ -48,21 +49,25 @@ FIELDS ={'rdf-schema#label': 'label',
 
 
 def add_field(filename, fields):
-
     process_fields = fields.keys()
     data = {}
     with open(filename, "r") as f:
         reader = csv.DictReader(f)
-        for i in range(3):
-            l = reader.next()
-        # YOUR CODE HERE
-
+        for line in reader:
+            # - process the csv file and extract 2 fields - 'rdf-schema#label' and 'binomialAuthority_label'
+            # - if 'binomialAuthority_label' is "NULL", skip the item
+            if "dbpedia.org" not in line["URI"] or line["binomialAuthority_label"] == "NULL":
+                continue
+            # - clean up the 'rdf-schema#label' same way as in the first exercise - removing redundant "(spider)" suffixes
+            line["rdf-schema#label"] = re.match(r'^(.*?)( \([^)]+\)|)$', line["rdf-schema#label"].strip()).group(1)
+            # - return a dictionary, with 'label' being the key, and 'binomialAuthority_label' the value
+            data[line["rdf-schema#label"]] = line["binomialAuthority_label"]
     return data
 
 
 def update_db(data, db):
-    # YOUR CODE HERE
-    pass
+    for row in data:
+        db.arachnid.update({"label": row}, {"$set" : {"classification.binomialAuthority": data[row]}}, multi=True)
 
 
 def test():

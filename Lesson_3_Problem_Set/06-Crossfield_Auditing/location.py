@@ -24,9 +24,16 @@ CITIES = 'cities.csv'
 
 
 def check_loc(point, lat, longi):
-    # YOUR CODE HERE
-    
-    pass
+    lat1 = float(lat)
+    longi1 = float(longi)
+    pointlist = []
+    if point.startswith("{") and point.endswith("}"):
+        pointlist = point.split("|")
+    else:
+        pointlist = point.split(" ")
+    lat2 = float(pointlist[0])
+    longi2 = float(pointlist[1])
+    return (lat1 == lat2) and (longi1 == longi2)
 
 
 def process_file(filename):
