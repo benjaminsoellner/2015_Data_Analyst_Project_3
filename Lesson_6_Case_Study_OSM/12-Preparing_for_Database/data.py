@@ -110,19 +110,19 @@ def shape_element(element):
                     node["pos"][0] = float(v)
                 else:
                     node["pos"][1] = float(v)
-            else:
+            elif problemchars.match(k) is None:
                 node[k] = v
         for e in element.iter():
             if e.tag == "tag" and "k" in e.attrib.keys() and "v" in e.attrib.keys():
                 k = e.attrib["k"]
                 kk = k.split(":")
                 v = e.attrib["v"]
-                if problemchars.match(k) == None and len(kk) <= 2:
+                if problemchars.match(k) is None and len(kk) <= 2:
                     if kk[0] == "addr" and len(kk) == 2:
                         if "address" not in node.keys():
                             node["address"] = {}
                         node["address"][kk[1]] = v
-                    else:
+                    elif len(kk) == 1:
                         node[k] = v
             elif e.tag == "nd" and "ref" in e.attrib.keys():
                 if "node_refs" not in node.keys():

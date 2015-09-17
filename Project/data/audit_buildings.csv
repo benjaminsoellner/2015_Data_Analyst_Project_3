@@ -1,0 +1,249 @@
+,_id,street_name,num_nearby,nb_best,nb_best_dist,nb_worst,nb_worst_dist
+0,55e8e19db1c8a71ef4d14800,Altnaundorf,0,,,,
+1,55e8e1a4b1c8a71ef4d197b9,Moritzburger Straße,0,,,,
+2,55e8e1a8b1c8a71ef4d1cd47,Großenhainer Straße,2,Großenhainer Straße,0.0,Bolivarstraße,11.0
+3,55e8e1b9b1c8a71ef4d298ea,Grunaer Straße,0,,,,
+4,55e8e1beb1c8a71ef4d2d079,Tharandter Straße,0,,,,
+5,55e8e1c3b1c8a71ef4d31376,Burgsdorffstraße,1,Wahnsdorfer Straße,8.0,Wahnsdorfer Straße,8.0
+6,55e8e1c3b1c8a71ef4d315b0,Großenhainer Straße,1,Großenhainer Straße,0.0,Großenhainer Straße,0.0
+7,55e8e1dcb1c8a71ef4d4368e,Großenhainer Straße,1,Großenhainer Straße,0.0,Großenhainer Straße,0.0
+8,55e8e1e1b1c8a71ef4d477a0,Kyawstraße,1,Kyawstraße,0.0,Kyawstraße,0.0
+9,55e8e1e2b1c8a71ef4d47f86,Kunadstraße,0,,,,
+10,55e8e1e3b1c8a71ef4d48b0d,Stübelallee,0,,,,
+11,55e8e1eeb1c8a71ef4d50a42,Böttgerstraße,1,Böttgerstraße,0.0,Böttgerstraße,0.0
+12,55e8e1eeb1c8a71ef4d50a45,Böttgerstraße,2,Böttgerstraße,0.0,Kopernikusstraße,10.0
+13,55e8e1eeb1c8a71ef4d50a48,Böttgerstraße,1,Böttgerstraße,0.0,Böttgerstraße,0.0
+14,55e8e1eeb1c8a71ef4d50a4b,Böttgerstraße,2,Böttgerstraße,0.0,Kopernikusstraße,10.0
+15,55e8e1eeb1c8a71ef4d50a4c,Böttgerstraße,1,Böttgerstraße,0.0,Böttgerstraße,0.0
+16,55e8e1eeb1c8a71ef4d50a4d,Böttgerstraße,1,Böttgerstraße,0.0,Böttgerstraße,0.0
+17,55e8e1eeb1c8a71ef4d50a4e,Böttgerstraße,1,Böttgerstraße,0.0,Böttgerstraße,0.0
+18,55e8e1eeb1c8a71ef4d50a53,Böttgerstraße,1,Böttgerstraße,0.0,Böttgerstraße,0.0
+19,55e8e1eeb1c8a71ef4d50a54,Böttgerstraße,1,Böttgerstraße,0.0,Böttgerstraße,0.0
+20,55e8e1eeb1c8a71ef4d50a58,Böttgerstraße,1,Böttgerstraße,0.0,Böttgerstraße,0.0
+21,55e8e1eeb1c8a71ef4d50a5a,Böttgerstraße,1,Böttgerstraße,0.0,Böttgerstraße,0.0
+22,55e8e1eeb1c8a71ef4d50a96,Burgsdorffstraße,2,Burgsdorffstraße,0.0,Reichenberger Straße,14.0
+23,55e8e1eeb1c8a71ef4d50a9b,Wahnsdorfer Straße,2,Burgsdorffstraße,8.0,Großenhainer Straße,10.0
+24,55e8e1eeb1c8a71ef4d50aeb,Großenhainer Straße,2,Großenhainer Straße,0.0,Reichenberger Straße,9.0
+25,55e8e1eeb1c8a71ef4d50c4d,Platanenstraße,0,,,,
+26,55e8e1eeb1c8a71ef4d50c50,Großenhainer Straße,1,Großenhainer Straße,0.0,Großenhainer Straße,0.0
+27,55e8e1eeb1c8a71ef4d50cf7,Böttgerstraße,1,Böttgerstraße,0.0,Böttgerstraße,0.0
+28,55e8e1eeb1c8a71ef4d50cfa,Böttgerstraße,1,Böttgerstraße,0.0,Böttgerstraße,0.0
+29,55e8e1eeb1c8a71ef4d50d18,Böttgerstraße,1,Böttgerstraße,0.0,Böttgerstraße,0.0
+30,55e8e1eeb1c8a71ef4d50d25,Böttgerstraße,1,Böttgerstraße,0.0,Böttgerstraße,0.0
+31,55e8e1eeb1c8a71ef4d50d26,Wahnsdorfer Straße,1,Burgsdorffstraße,8.0,Burgsdorffstraße,8.0
+32,55e8e1efb1c8a71ef4d5199c,Burgsdorffstraße,2,Burgsdorffstraße,0.0,Wahnsdorfer Straße,8.0
+33,55e8e1efb1c8a71ef4d521f0,Reichenberger Straße,1,Burgsdorffstraße,14.0,Burgsdorffstraße,14.0
+34,55e8e1f0b1c8a71ef4d52d0d,Overbeckstraße,1,Overbeckstraße,0.0,Overbeckstraße,0.0
+35,55e8e1f1b1c8a71ef4d534fd,Reichenberger Straße,1,Reichenberger Straße,0.0,Reichenberger Straße,0.0
+36,55e8e1f1b1c8a71ef4d53520,Reichenberger Straße,2,Reichenberger Straße,0.0,Großenhainer Straße,9.0
+37,55e8e1f2b1c8a71ef4d53b66,Reichenberger Straße,2,Reichenberger Straße,0.0,Großenhainer Straße,9.0
+38,55e8e1f2b1c8a71ef4d53e9b,Scharfenberger Straße,0,,,,
+39,55e8e1f3b1c8a71ef4d547a6,Köpckestraße,0,,,,
+40,55e8e1f4b1c8a71ef4d5547a,Jonsdorfer Straße,2,Jonsdorfer Straße,0.0,Rosenthaler Straße,8.0
+41,55e8e1f4b1c8a71ef4d5547b,Jonsdorfer Straße,2,Jonsdorfer Straße,0.0,Bahnhofstraße,10.0
+42,55e8e1f4b1c8a71ef4d5547c,Jonsdorfer Straße,1,Jonsdorfer Straße,0.0,Jonsdorfer Straße,0.0
+43,55e8e1f4b1c8a71ef4d5547d,Jonsdorfer Straße,0,,,,
+44,55e8e1f6b1c8a71ef4d56ffa,Goetheallee,1,Goetheallee,0.0,Goetheallee,0.0
+45,55e8e1f6b1c8a71ef4d56ffb,Goetheallee,1,Goetheallee,0.0,Goetheallee,0.0
+46,55e8e1fab1c8a71ef4d5a610,Moritzburger Weg,0,,,,
+47,55e8e1fcb1c8a71ef4d5b931,Bolivarstraße,2,Bolivarstraße,0.0,Virchowstraße,7.0
+48,55e8e1fcb1c8a71ef4d5b961,Bolivarstraße,2,Bolivarstraße,0.0,Großenhainer Straße,11.0
+49,55e8e1fcb1c8a71ef4d5b963,Bolivarstraße,1,Bolivarstraße,0.0,Bolivarstraße,0.0
+50,55e8e202b1c8a71ef4d601fe,Grumbacher Straße,1,Grumbacher Straße,0.0,Grumbacher Straße,0.0
+51,55e8e206b1c8a71ef4d633de,Bolivarstraße,1,Bolivarstraße,0.0,Bolivarstraße,0.0
+52,55e8e206b1c8a71ef4d633df,Bolivarstraße,1,Bolivarstraße,0.0,Bolivarstraße,0.0
+53,55e8e206b1c8a71ef4d633e0,Bolivarstraße,1,Bolivarstraße,0.0,Bolivarstraße,0.0
+54,55e8e206b1c8a71ef4d633e1,Bolivarstraße,1,Bolivarstraße,0.0,Bolivarstraße,0.0
+55,55e8e206b1c8a71ef4d633e2,Bolivarstraße,1,Bolivarstraße,0.0,Bolivarstraße,0.0
+56,55e8e206b1c8a71ef4d633e4,Bolivarstraße,1,Bolivarstraße,0.0,Bolivarstraße,0.0
+57,55e8e206b1c8a71ef4d633e5,Bolivarstraße,1,Bolivarstraße,0.0,Bolivarstraße,0.0
+58,55e8e206b1c8a71ef4d633e6,Bolivarstraße,1,Bolivarstraße,0.0,Bolivarstraße,0.0
+59,55e8e206b1c8a71ef4d633e7,Bolivarstraße,1,Bolivarstraße,0.0,Bolivarstraße,0.0
+60,55e8e206b1c8a71ef4d633e8,Bolivarstraße,1,Bolivarstraße,0.0,Bolivarstraße,0.0
+61,55e8e206b1c8a71ef4d633e9,Bolivarstraße,1,Bolivarstraße,0.0,Bolivarstraße,0.0
+62,55e8e206b1c8a71ef4d633ea,Bolivarstraße,1,Bolivarstraße,0.0,Bolivarstraße,0.0
+63,55e8e206b1c8a71ef4d633eb,Bolivarstraße,1,Bolivarstraße,0.0,Bolivarstraße,0.0
+64,55e8e206b1c8a71ef4d633ec,Bolivarstraße,1,Bolivarstraße,0.0,Bolivarstraße,0.0
+65,55e8e206b1c8a71ef4d633ed,Bolivarstraße,1,Bolivarstraße,0.0,Bolivarstraße,0.0
+66,55e8e206b1c8a71ef4d633ee,Bolivarstraße,2,Bolivarstraße,0.0,Großenhainer Straße,11.0
+67,55e8e206b1c8a71ef4d633ef,Bolivarstraße,1,Bolivarstraße,0.0,Bolivarstraße,0.0
+68,55e8e206b1c8a71ef4d633f0,Bolivarstraße,1,Bolivarstraße,0.0,Bolivarstraße,0.0
+69,55e8e206b1c8a71ef4d633f1,Bolivarstraße,1,Bolivarstraße,0.0,Bolivarstraße,0.0
+70,55e8e206b1c8a71ef4d633f2,Bolivarstraße,1,Bolivarstraße,0.0,Bolivarstraße,0.0
+71,55e8e206b1c8a71ef4d633f3,Bolivarstraße,1,Bolivarstraße,0.0,Bolivarstraße,0.0
+72,55e8e206b1c8a71ef4d633f4,Bolivarstraße,1,Bolivarstraße,0.0,Bolivarstraße,0.0
+73,55e8e206b1c8a71ef4d633f5,Bolivarstraße,1,Bolivarstraße,0.0,Bolivarstraße,0.0
+74,55e8e206b1c8a71ef4d633f6,Bolivarstraße,1,Bolivarstraße,0.0,Bolivarstraße,0.0
+75,55e8e206b1c8a71ef4d633f7,Bolivarstraße,2,Bolivarstraße,0.0,Großenhainer Straße,11.0
+76,55e8e206b1c8a71ef4d633f8,Bolivarstraße,1,Bolivarstraße,0.0,Bolivarstraße,0.0
+77,55e8e20cb1c8a71ef4d676d1,Kiefernweg,0,,,,
+78,55e8e218b1c8a71ef4d7125f,Burgsdorffstraße,2,Burgsdorffstraße,0.0,Reichenberger Straße,14.0
+79,55e8e219b1c8a71ef4d71421,Seifersdorfer Straße,0,,,,
+80,55e8e21cb1c8a71ef4d73b97,Heideblick,1,Heideblick,0.0,Heideblick,0.0
+81,55e8e21cb1c8a71ef4d73b9e,Heideblick,1,Heideblick,0.0,Heideblick,0.0
+82,55e8e21fb1c8a71ef4d76087,Bonnewitzer Straße,0,,,,
+83,55e8e227b1c8a71ef4d7c4e2,Dr.-Külz-Ring,0,,,,
+84,55e8e22ab1c8a71ef4d7ebf2,Zur Wetterwarte,0,,,,
+85,55e8e22fb1c8a71ef4d82615,Peschelstraße,1,Peschelstraße,0.0,Peschelstraße,0.0
+86,55e8e22fb1c8a71ef4d82617,Peschelstraße,1,Peschelstraße,0.0,Peschelstraße,0.0
+87,55e8e22fb1c8a71ef4d82619,Peschelstraße,1,Peschelstraße,0.0,Peschelstraße,0.0
+88,55e8e22fb1c8a71ef4d82632,Peschelstraße,1,Peschelstraße,0.0,Peschelstraße,0.0
+89,55e8e22fb1c8a71ef4d82635,Peschelstraße,1,Peschelstraße,0.0,Peschelstraße,0.0
+90,55e8e22fb1c8a71ef4d82638,Peschelstraße,1,Peschelstraße,0.0,Peschelstraße,0.0
+91,55e8e234b1c8a71ef4d86637,Dresdner Straße,1,Dresdner Straße,0.0,Dresdner Straße,0.0
+92,55e8e23fb1c8a71ef4d8eb95,Ferdinand-Freiligrath-Straße,1,Ferdinand-Freiligrath-Straße,0.0,Ferdinand-Freiligrath-Straße,0.0
+93,55e8e23fb1c8a71ef4d8eb96,Ferdinand-Freiligrath-Straße,1,Ferdinand-Freiligrath-Straße,0.0,Ferdinand-Freiligrath-Straße,0.0
+94,55e8e23fb1c8a71ef4d8eb97,Markt,0,,,,
+95,55e8e256b1c8a71ef4da0611,Hechtstraße,1,Hechtstraße,0.0,Hechtstraße,0.0
+96,55e8e258b1c8a71ef4da1e78,Reisewitzer Straße,0,,,,
+97,55e8e25db1c8a71ef4da558b,An der Siedlung,0,,,,
+98,55e8e264b1c8a71ef4dab225,Bautzner Straße,1,Böhmische Straße,8.0,Böhmische Straße,8.0
+99,55e8e265b1c8a71ef4dac0bc,Clara-Viebig-Straße,0,,,,
+100,55e8e26cb1c8a71ef4db103e,Overbeckstraße,1,Overbeckstraße,0.0,Overbeckstraße,0.0
+101,55e8e26eb1c8a71ef4db2ae6,Neucoswiger Straße,0,,,,
+102,55e8e274b1c8a71ef4db6c00,Comeniusstraße,0,,,,
+103,55e8e274b1c8a71ef4db6c01,Comeniusstraße,0,,,,
+104,55e8e276b1c8a71ef4db8a13,Reisewitzer Straße,1,Bonhoefferplatz,15.0,Bonhoefferplatz,15.0
+105,55e8e280b1c8a71ef4dbfd9b,Försterlingstraße,1,Försterlingstraße,0.0,Försterlingstraße,0.0
+106,55e8e280b1c8a71ef4dbfda1,Försterlingstraße,1,Försterlingstraße,0.0,Försterlingstraße,0.0
+107,55e8e280b1c8a71ef4dbfda7,Försterlingstraße,1,Försterlingstraße,0.0,Försterlingstraße,0.0
+108,55e8e280b1c8a71ef4dbfdbc,Försterlingstraße,1,Försterlingstraße,0.0,Försterlingstraße,0.0
+109,55e8e283b1c8a71ef4dc1bef,Schmilkaer Straße,1,Schmilkaer Straße,0.0,Schmilkaer Straße,0.0
+110,55e8e283b1c8a71ef4dc1bf0,Schmilkaer Straße,1,Schmilkaer Straße,0.0,Schmilkaer Straße,0.0
+111,55e8e283b1c8a71ef4dc1bf1,Schmilkaer Straße,1,Schmilkaer Straße,0.0,Schmilkaer Straße,0.0
+112,55e8e283b1c8a71ef4dc1bf2,Schmilkaer Straße,1,Schmilkaer Straße,0.0,Schmilkaer Straße,0.0
+113,55e8e283b1c8a71ef4dc1bf3,Schmilkaer Straße,1,Schmilkaer Straße,0.0,Schmilkaer Straße,0.0
+114,55e8e283b1c8a71ef4dc1bf4,Schmilkaer Straße,1,Schmilkaer Straße,0.0,Schmilkaer Straße,0.0
+115,55e8e283b1c8a71ef4dc1bf5,Schmilkaer Straße,1,Schmilkaer Straße,0.0,Schmilkaer Straße,0.0
+116,55e8e283b1c8a71ef4dc1bf6,Schmilkaer Straße,1,Schmilkaer Straße,0.0,Schmilkaer Straße,0.0
+117,55e8e283b1c8a71ef4dc23d3,Röhrsdorfer Straße,1,Röhrsdorfer Straße,0.0,Röhrsdorfer Straße,0.0
+118,55e8e2abb1c8a71ef4de0576,Schachtstraße,1,Schachtstraße,0.0,Schachtstraße,0.0
+119,55e8e2adb1c8a71ef4de1b02,Kirchstraße,0,,,,
+120,55e8e2adb1c8a71ef4de1b1d,Tharandter Straße,0,,,,
+121,55e8e2adb1c8a71ef4de1dab,Hoher Plan,0,,,,
+122,55e8e2afb1c8a71ef4de30d7,Pfarrer-Wolf-Straße,1,Pfarrer-Wolf-Straße,0.0,Pfarrer-Wolf-Straße,0.0
+123,55e8e2afb1c8a71ef4de30d8,Pfarrer-Wolf-Straße,1,Pfarrer-Wolf-Straße,0.0,Pfarrer-Wolf-Straße,0.0
+124,55e8e2afb1c8a71ef4de30d9,Pfarrer-Wolf-Straße,2,Pfarrer-Wolf-Straße,0.0,Reiboldschachtring,17.0
+125,55e8e2afb1c8a71ef4de30da,Pfarrer-Wolf-Straße,1,Pfarrer-Wolf-Straße,0.0,Pfarrer-Wolf-Straße,0.0
+126,55e8e2afb1c8a71ef4de30db,Pfarrer-Wolf-Straße,1,Pfarrer-Wolf-Straße,0.0,Pfarrer-Wolf-Straße,0.0
+127,55e8e2afb1c8a71ef4de30dc,Pfarrer-Wolf-Straße,1,Pfarrer-Wolf-Straße,0.0,Pfarrer-Wolf-Straße,0.0
+128,55e8e2afb1c8a71ef4de30dd,Pfarrer-Wolf-Straße,1,Pfarrer-Wolf-Straße,0.0,Pfarrer-Wolf-Straße,0.0
+129,55e8e2afb1c8a71ef4de30df,Pfarrer-Wolf-Straße,2,Pfarrer-Wolf-Straße,0.0,Kohlenstraße,13.0
+130,55e8e2b2b1c8a71ef4de573f,Birkigter Hang,0,,,,
+131,55e8e2b7b1c8a71ef4de8f5d,Langebrücker Straße,1,Langebrücker Straße,0.0,Langebrücker Straße,0.0
+132,55e8e2b7b1c8a71ef4de8f5e,Gartenweg,0,,,,
+133,55e8e2b7b1c8a71ef4de96e2,Hainsberger Straße,2,Hainsberger Straße,0.0,An der Kleinbahn,14.0
+134,55e8e2bab1c8a71ef4deb424,Cornelius-Gurlitt-Straße,0,,,,
+135,55e8e2c4b1c8a71ef4df34f8,Wehrstraße,1,Wehrstraße,0.0,Wehrstraße,0.0
+136,55e8e2c4b1c8a71ef4df34f9,Wehrstraße,1,Wehrstraße,0.0,Wehrstraße,0.0
+137,55e8e2c5b1c8a71ef4df3dc7,Lange Straße,1,Lange Straße,0.0,Lange Straße,0.0
+138,55e8e2c5b1c8a71ef4df3e76,Dresdner Straße,1,Dresdner Straße,0.0,Dresdner Straße,0.0
+139,55e8e2cdb1c8a71ef4df9e49,Eisenbahnstraße,1,Eisenbahnstraße,0.0,Eisenbahnstraße,0.0
+140,55e8e2cdb1c8a71ef4df9e4f,Eisenbahnstraße,1,Eisenbahnstraße,0.0,Eisenbahnstraße,0.0
+141,55e8e2cdb1c8a71ef4df9e54,Eisenbahnstraße,1,Eisenbahnstraße,0.0,Eisenbahnstraße,0.0
+142,55e8e2cdb1c8a71ef4df9e55,Eisenbahnstraße,1,Eisenbahnstraße,0.0,Eisenbahnstraße,0.0
+143,55e8e2cdb1c8a71ef4df9e58,Eisenbahnstraße,1,Eisenbahnstraße,0.0,Eisenbahnstraße,0.0
+144,55e8e2cdb1c8a71ef4df9e5f,Eisenbahnstraße,1,Eisenbahnstraße,0.0,Eisenbahnstraße,0.0
+145,55e8e2d8b1c8a71ef4e0246a,Alaunstraße,2,Alaunstraße,0.0,Görlitzer Straße,10.0
+146,55e8e2d9b1c8a71ef4e03239,Am Lehmberg,1,Alte Meißner Landstraße,18.0,Alte Meißner Landstraße,18.0
+147,55e8e2dbb1c8a71ef4e05119,Heinrich-Heine-Straße,1,Heinrich-Heine-Straße,0.0,Heinrich-Heine-Straße,0.0
+148,55e8e2dbb1c8a71ef4e0511a,Heinrich-Heine-Straße,1,Heinrich-Heine-Straße,0.0,Heinrich-Heine-Straße,0.0
+149,55e8e2dbb1c8a71ef4e0511b,Heinrich-Heine-Straße,1,Heinrich-Heine-Straße,0.0,Heinrich-Heine-Straße,0.0
+150,55e8e2dbb1c8a71ef4e0511c,Heinrich-Heine-Straße,1,Heinrich-Heine-Straße,0.0,Heinrich-Heine-Straße,0.0
+151,55e8e2dbb1c8a71ef4e0511d,Heinrich-Heine-Straße,1,Heinrich-Heine-Straße,0.0,Heinrich-Heine-Straße,0.0
+152,55e8e2deb1c8a71ef4e07682,Breitscheidstraße,1,Breitscheidstraße,0.0,Breitscheidstraße,0.0
+153,55e8e2e6b1c8a71ef4e0d447,Lutherstraße,0,,,,
+154,55e8e2e7b1c8a71ef4e0d90b,Loschwitzer Straße,0,,,,
+155,55e8e2ebb1c8a71ef4e10e39,Dresdner Straße,1,Dresdner Straße,0.0,Dresdner Straße,0.0
+156,55e8e2ebb1c8a71ef4e10e3a,Brückenstraße,2,Brückenstraße,0.0,Am Mittelfeld,13.0
+157,55e8e2ebb1c8a71ef4e10e3b,Brückenstraße,2,Brückenstraße,0.0,Am Mittelfeld,13.0
+158,55e8e2ebb1c8a71ef4e10e3c,Kötzschenbrodaer Straße,1,Kötzschenbrodaer Straße,0.0,Kötzschenbrodaer Straße,0.0
+159,55e8e2ebb1c8a71ef4e10e3e,Brückenstraße,1,Brückenstraße,0.0,Brückenstraße,0.0
+160,55e8e2ebb1c8a71ef4e10e3f,Kötzschenbrodaer Straße,1,Kötzschenbrodaer Straße,0.0,Kötzschenbrodaer Straße,0.0
+161,55e8e2ebb1c8a71ef4e10e41,Dresdner Straße,1,Dresdner Straße,0.0,Dresdner Straße,0.0
+162,55e8e2ebb1c8a71ef4e10e42,Am Mittelfeld,2,Am Mittelfeld,0.0,Brückenstraße,13.0
+163,55e8e2ebb1c8a71ef4e10e45,Am Mittelfeld,1,Am Mittelfeld,0.0,Am Mittelfeld,0.0
+164,55e8e2ebb1c8a71ef4e10e48,Am Mittelfeld,1,Am Mittelfeld,0.0,Am Mittelfeld,0.0
+165,55e8e2ebb1c8a71ef4e10e4a,Serkowitzer Straße,1,Serkowitzer Straße,0.0,Serkowitzer Straße,0.0
+166,55e8e2ebb1c8a71ef4e10e4b,Am Mittelfeld,1,Am Mittelfeld,0.0,Am Mittelfeld,0.0
+167,55e8e2ebb1c8a71ef4e10e4d,Am Mittelfeld,2,Am Mittelfeld,0.0,Serkowitzer Straße,15.0
+168,55e8e2ebb1c8a71ef4e10e4f,Dresdner Straße,1,Dresdner Straße,0.0,Dresdner Straße,0.0
+169,55e8e2ebb1c8a71ef4e10e50,Brückenstraße,1,Brückenstraße,0.0,Brückenstraße,0.0
+170,55e8e2ebb1c8a71ef4e10e52,Brückenstraße,1,Brückenstraße,0.0,Brückenstraße,0.0
+171,55e8e2ebb1c8a71ef4e10e54,Brückenstraße,1,Brückenstraße,0.0,Brückenstraße,0.0
+172,55e8e2ebb1c8a71ef4e10e5a,Brückenstraße,1,Brückenstraße,0.0,Brückenstraße,0.0
+173,55e8e2ebb1c8a71ef4e10e5c,Brückenstraße,1,Brückenstraße,0.0,Brückenstraße,0.0
+174,55e8e2ebb1c8a71ef4e10e5e,Brückenstraße,1,Brückenstraße,0.0,Brückenstraße,0.0
+175,55e8e2ebb1c8a71ef4e10e60,Kötzschenbrodaer Straße,1,Kötzschenbrodaer Straße,0.0,Kötzschenbrodaer Straße,0.0
+176,55e8e2ebb1c8a71ef4e10e61,Kötzschenbrodaer Straße,1,Kötzschenbrodaer Straße,0.0,Kötzschenbrodaer Straße,0.0
+177,55e8e2ebb1c8a71ef4e10e62,Kötzschenbrodaer Straße,1,Kötzschenbrodaer Straße,0.0,Kötzschenbrodaer Straße,0.0
+178,55e8e2ebb1c8a71ef4e10e63,Kötzschenbrodaer Straße,1,Kötzschenbrodaer Straße,0.0,Kötzschenbrodaer Straße,0.0
+179,55e8e2ebb1c8a71ef4e10e64,Kötzschenbrodaer Straße,1,Kötzschenbrodaer Straße,0.0,Kötzschenbrodaer Straße,0.0
+180,55e8e2ebb1c8a71ef4e10e65,Kötzschenbrodaer Straße,1,Kötzschenbrodaer Straße,0.0,Kötzschenbrodaer Straße,0.0
+181,55e8e2ebb1c8a71ef4e10e66,Brückenstraße,1,Brückenstraße,0.0,Brückenstraße,0.0
+182,55e8e2ebb1c8a71ef4e10e67,Brückenstraße,1,Brückenstraße,0.0,Brückenstraße,0.0
+183,55e8e2ebb1c8a71ef4e10e68,Brückenstraße,1,Brückenstraße,0.0,Brückenstraße,0.0
+184,55e8e2ebb1c8a71ef4e10e69,Serkowitzer Straße,1,Serkowitzer Straße,0.0,Serkowitzer Straße,0.0
+185,55e8e2ebb1c8a71ef4e10e6a,Serkowitzer Straße,1,Serkowitzer Straße,0.0,Serkowitzer Straße,0.0
+186,55e8e2ebb1c8a71ef4e10e6b,Serkowitzer Straße,1,Serkowitzer Straße,0.0,Serkowitzer Straße,0.0
+187,55e8e2ebb1c8a71ef4e10e6c,Serkowitzer Straße,1,Serkowitzer Straße,0.0,Serkowitzer Straße,0.0
+188,55e8e2ebb1c8a71ef4e10e6d,Serkowitzer Straße,1,Serkowitzer Straße,0.0,Serkowitzer Straße,0.0
+189,55e8e2ebb1c8a71ef4e10e6e,Serkowitzer Straße,1,Serkowitzer Straße,0.0,Serkowitzer Straße,0.0
+190,55e8e2ebb1c8a71ef4e10e77,Radebeuler Straße,1,Radebeuler Straße,0.0,Radebeuler Straße,0.0
+191,55e8e2ebb1c8a71ef4e10e78,Radebeuler Straße,1,Radebeuler Straße,0.0,Radebeuler Straße,0.0
+192,55e8e2ebb1c8a71ef4e10e79,Radebeuler Straße,1,Radebeuler Straße,0.0,Radebeuler Straße,0.0
+193,55e8e2ebb1c8a71ef4e10e7a,Radebeuler Straße,1,Radebeuler Straße,0.0,Radebeuler Straße,0.0
+194,55e8e2ebb1c8a71ef4e10e7b,Radebeuler Straße,1,Radebeuler Straße,0.0,Radebeuler Straße,0.0
+195,55e8e2ebb1c8a71ef4e10e7c,Radebeuler Straße,1,Radebeuler Straße,0.0,Radebeuler Straße,0.0
+196,55e8e2ebb1c8a71ef4e10e7d,Radebeuler Straße,1,Radebeuler Straße,0.0,Radebeuler Straße,0.0
+197,55e8e2ebb1c8a71ef4e10e7e,Kötzschenbrodaer Straße,1,Kötzschenbrodaer Straße,0.0,Kötzschenbrodaer Straße,0.0
+198,55e8e2ebb1c8a71ef4e10e7f,Kötzschenbrodaer Straße,1,Kötzschenbrodaer Straße,0.0,Kötzschenbrodaer Straße,0.0
+199,55e8e2ebb1c8a71ef4e10e80,Radebeuler Straße,1,Radebeuler Straße,0.0,Radebeuler Straße,0.0
+200,55e8e2ebb1c8a71ef4e10e81,Kötzschenbrodaer Straße,1,Kötzschenbrodaer Straße,0.0,Kötzschenbrodaer Straße,0.0
+201,55e8e2ebb1c8a71ef4e10e82,Radebeuler Straße,1,Radebeuler Straße,0.0,Radebeuler Straße,0.0
+202,55e8e2ebb1c8a71ef4e10e83,Kötzschenbrodaer Straße,1,Kötzschenbrodaer Straße,0.0,Kötzschenbrodaer Straße,0.0
+203,55e8e2ebb1c8a71ef4e10e84,Kötzschenbrodaer Straße,1,Kötzschenbrodaer Straße,0.0,Kötzschenbrodaer Straße,0.0
+204,55e8e2ebb1c8a71ef4e10e85,Radebeuler Straße,1,Radebeuler Straße,0.0,Radebeuler Straße,0.0
+205,55e8e2ebb1c8a71ef4e10e86,Kötzschenbrodaer Straße,1,Kötzschenbrodaer Straße,0.0,Kötzschenbrodaer Straße,0.0
+206,55e8e2ebb1c8a71ef4e10e87,Radebeuler Straße,1,Radebeuler Straße,0.0,Radebeuler Straße,0.0
+207,55e8e2ebb1c8a71ef4e10e88,Kötzschenbrodaer Straße,1,Kötzschenbrodaer Straße,0.0,Kötzschenbrodaer Straße,0.0
+208,55e8e2ebb1c8a71ef4e10e89,Radebeuler Straße,1,Radebeuler Straße,0.0,Radebeuler Straße,0.0
+209,55e8e2ebb1c8a71ef4e10e8a,Radebeuler Straße,1,Radebeuler Straße,0.0,Radebeuler Straße,0.0
+210,55e8e2ebb1c8a71ef4e10e8b,Radebeuler Straße,1,Radebeuler Straße,0.0,Radebeuler Straße,0.0
+211,55e8e2ebb1c8a71ef4e10e8c,Am Mittelfeld,1,Am Mittelfeld,0.0,Am Mittelfeld,0.0
+212,55e8e2ebb1c8a71ef4e10e8d,Am Mittelfeld,1,Am Mittelfeld,0.0,Am Mittelfeld,0.0
+213,55e8e2ebb1c8a71ef4e10e8e,Am Mittelfeld,1,Am Mittelfeld,0.0,Am Mittelfeld,0.0
+214,55e8e2ebb1c8a71ef4e10e8f,Radebeuler Straße,1,Radebeuler Straße,0.0,Radebeuler Straße,0.0
+215,55e8e2ebb1c8a71ef4e10e90,Radebeuler Straße,1,Radebeuler Straße,0.0,Radebeuler Straße,0.0
+216,55e8e2ebb1c8a71ef4e10e92,Breite Straße,1,Breite Straße,0.0,Breite Straße,0.0
+217,55e8e2ebb1c8a71ef4e10e93,Breite Straße,1,Breite Straße,0.0,Breite Straße,0.0
+218,55e8e2ebb1c8a71ef4e10e94,Breite Straße,1,Breite Straße,0.0,Breite Straße,0.0
+219,55e8e2ebb1c8a71ef4e10e95,Breite Straße,1,Breite Straße,0.0,Breite Straße,0.0
+220,55e8e2ebb1c8a71ef4e10e96,Breite Straße,1,Breite Straße,0.0,Breite Straße,0.0
+221,55e8e2ebb1c8a71ef4e10e97,Breite Straße,1,Breite Straße,0.0,Breite Straße,0.0
+222,55e8e2ebb1c8a71ef4e10e98,Breite Straße,1,Breite Straße,0.0,Breite Straße,0.0
+223,55e8e2ebb1c8a71ef4e10e99,Breite Straße,2,Breite Straße,0.0,Lößnitzstraße,7.0
+224,55e8e2ebb1c8a71ef4e10e9a,Breite Straße,2,Breite Straße,0.0,Lößnitzstraße,7.0
+225,55e8e2ebb1c8a71ef4e10e9b,Breite Straße,2,Breite Straße,0.0,Lößnitzstraße,7.0
+226,55e8e2ebb1c8a71ef4e10e9c,Breite Straße,1,Breite Straße,0.0,Breite Straße,0.0
+227,55e8e2ebb1c8a71ef4e10e9d,Breite Straße,1,Breite Straße,0.0,Breite Straße,0.0
+228,55e8e2ebb1c8a71ef4e10e9e,Breite Straße,1,Breite Straße,0.0,Breite Straße,0.0
+229,55e8e2ebb1c8a71ef4e10e9f,Breite Straße,1,Breite Straße,0.0,Breite Straße,0.0
+230,55e8e2ebb1c8a71ef4e10ea0,Breite Straße,1,Breite Straße,0.0,Breite Straße,0.0
+231,55e8e2ebb1c8a71ef4e10ea1,Breite Straße,1,Breite Straße,0.0,Breite Straße,0.0
+232,55e8e2ebb1c8a71ef4e10ea2,Breite Straße,1,Breite Straße,0.0,Breite Straße,0.0
+233,55e8e2ebb1c8a71ef4e10ea3,Lößnitzstraße,1,Lößnitzstraße,0.0,Lößnitzstraße,0.0
+234,55e8e2ebb1c8a71ef4e10ea4,Lößnitzstraße,1,Lößnitzstraße,0.0,Lößnitzstraße,0.0
+235,55e8e2ebb1c8a71ef4e10ea5,Lößnitzstraße,1,Lößnitzstraße,0.0,Lößnitzstraße,0.0
+236,55e8e2ebb1c8a71ef4e10ea6,Am Ringpark,2,Am Ringpark,0.0,Radebeuler Straße,16.0
+237,55e8e2ebb1c8a71ef4e10ea7,Am Ringpark,1,Am Ringpark,0.0,Am Ringpark,0.0
+238,55e8e2ebb1c8a71ef4e10ea8,Am Ringpark,1,Am Ringpark,0.0,Am Ringpark,0.0
+239,55e8e2ebb1c8a71ef4e10ea9,Am Ringpark,1,Am Ringpark,0.0,Am Ringpark,0.0
+240,55e8e2ebb1c8a71ef4e10eaa,Am Ringpark,1,Am Ringpark,0.0,Am Ringpark,0.0
+241,55e8e2ebb1c8a71ef4e10eab,Am Ringpark,1,Am Ringpark,0.0,Am Ringpark,0.0
+242,55e8e2ebb1c8a71ef4e1116f,Räcknitzhöhe,2,Räcknitzhöhe,0.0,Paradiesstraße,12.0
+243,55e8e2ebb1c8a71ef4e11174,Hohensteinstraße,0,,,,
+244,55e8e2ebb1c8a71ef4e11185,Gartenstraße,1,Gartenstraße,0.0,Gartenstraße,0.0
+245,55e8e2ebb1c8a71ef4e11186,Gartenstraße,1,Gartenstraße,0.0,Gartenstraße,0.0
+246,55e8e2ebb1c8a71ef4e11187,Gartenstraße,1,Gartenstraße,0.0,Gartenstraße,0.0
+247,55e8e2ebb1c8a71ef4e11194,Hohensteinstraße,0,,,,
