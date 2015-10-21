@@ -4,55 +4,65 @@ import pymongo
 import pprint
 import pandas
 
+def stats_general(osmnodesColl):
+    pipeline = [ {"$group": {"_id": "$type", "count": {"$sum": 1}}} ]
+    return list(osmnodesColl.aggregate(pipeline))
+
 def stats_users(osmnodesColl):
-    return list(osmnodesColl.aggregate([
+    pipeline = [
             {"$match": {"created.user": {"$exists": True}}},
             {"$group": {"_id": "$created.user", "count": {"$sum": 1}}},
             {"$sort": {"count": -1}}
-        ]))
+        ]
+    return list(osmnodesColl.aggregate(pipeline))
 
 
 def stats_amenities(osmnodesColl):
-    return list(osmnodesColl.aggregate([
+    pipeline = [
             {"$match": {"amenity": {"$exists": True}}},
             {"$group": {"_id": "$amenity", "count": {"$sum": 1}}},
             {"$sort": {"count": -1}}
-        ]))
+        ]
+    return list(osmnodesColl.aggregate(pipeline))
 
 def stats_leisure_activities(osmnodesColl):
-    return list(osmnodesColl.aggregate([
-            {"$match": {"leisure": {"$exists": True}}},
-            {"$group": {"_id": "$leisure", "count": {"$sum": 1}}},
-            {"$sort": {"count": -1}}
-        ]))
+    pipeline = [
+            {"$group": {"_id": "$type", "count": {"$sum": 1}}},
+            {"$match": {"_id": {"$in": ["node", "way"]}}}
+        ]
+    return list(osmnodesColl.aggregate(pipeline))
 
 def stats_religions(osmnodesColl):
-    return list(osmnodesColl.aggregate([
+    pipeline = [
             {"$match": {"amenity":{"$in": ["place_of_worship","community_center"]}}},
             {"$group": {"_id": "$religion", "count": {"$sum": 1}}},
             {"$sort": {"count": -1}}
-        ]))
+        ]
+    return list(osmnodesColl.aggregate(pipeline))
 
 def stats_cuisines(osmnodesColl):
-    return list(osmnodesColl.aggregate([
+    pipeline = [
             {"$match": {"amenity": "restaurant"}},
             {"$group": {"_id": "$cuisine", "count": {"$sum": 1}}},
             {"$sort": {"count": -1}}
-        ]))
+        ]
+    return list(osmnodesColl.aggregate(pipeline))
 
 def stats_beers(osmnodesColl):
-    return list(osmnodesColl.aggregate([
+    pipeline = [
             {"$match": {"amenity": {"$in":["pub","bar","restaurant"]}}},
             {"$group": {"_id": "$brewery", "count": {"$sum": 1}}},
             {"$sort": {"count": -1}}
-        ]))
+        ]
+    return list(osmnodesColl.aggregate(pipeline))
 
 def stats_sports(osmnodesColl):
-    return list(osmnodesColl.aggregate([
+    pipeline = [
             {"$match": {"leisure": {"$in": ["sports_centre","stadium"]}}},
             {"$group": {"_id": "$sport", "count": {"$sum": 1}}},
             {"$sort": {"count": -1}}
-        ]))
+        ]
+    return list(osmnodesColl.aggregate(pipeline))
 
 def stats_dances(osmnodesColl):
     return list(osmnodesColl.distinct("name", {"leisure": "dance"}))
@@ -75,6 +85,10 @@ def draw_graph(data, title, imageFileName):
 def audit_stats_map(mongoServer, mongoPort, imageFileNamePattern):
     client = MongoClient(mongoServer + ":" + mongoPort)
     c = client.udacity.osmnodes
+    print
+    print "Number of nodes and ways:"
+    r = stats_general(c)
+    pprint.pprint(r)
     print
     print "Users involved in creating the data:"
     r = stats_users(c)

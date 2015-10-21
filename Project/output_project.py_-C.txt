@@ -1,3 +1,6 @@
+Cleaning cuisines.
+Cleaning cuisines not possible in debug mode.
+Done cleaning cuisines.
 
 Cleaning phone numbers.
 Debug mode. Writing parsed phone names to file data/clean_phones.csv...

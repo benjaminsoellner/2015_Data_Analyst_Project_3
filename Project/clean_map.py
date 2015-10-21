@@ -13,6 +13,54 @@ phone_regex = re.compile(ur'^(\(?([\+|\*]|00) *(?P<country>[1-9][0-9]*)\)?)?' + 
                          ur'(?P<number>([0-9]+ *[\/\-.]? *)*)$', # number
                          re.UNICODE)
 
+cuisines_synonyms = {
+  'german': ['regional', 'schnitzel', 'buschenschank'],
+  'portuguese': ['Portugiesisches_Restaurant_&_Weinbar'],
+  'italian': ['pizza', 'pasta'],
+  'mediterranean': ['fish', 'seafood'],
+  'japanese': ['sushi'],
+  'turkish': ['kebab'],
+  'american': ['steak_house']
+}
+# not mapped:
+# greek, asian, chinese, indian, international, vietnamese, thai, spanish, arabic
+# sudanese, russian, korean, hungarian, syrian, vegan, soup, croatian, african
+# balkan, mexican, french, cuban, lebanese
+ 
+
+def clean_cuisines(db, debug, csvFilePattern, csvEncoding):
+    if debug:
+        print "Cleaning cuisines not possible in debug mode."
+        return
+    else:
+        print "Creating new parameter cuisineTags..."
+        db.eval('''
+                db.osmnodes.find({
+                        "cuisine": {"$exists": true},
+                        "amenity": "restaurant"
+                    }).snapshot().forEach(function(val, idx) {
+                        val.cuisineTags = val.cuisine.split(';');
+                        db.osmnodes.save(val)
+                    })
+            ''')
+        print "Normalizing parameter cuisineTags..."
+        for target in cuisines_synonyms:
+            print "... for " + target + " using " + str(cuisines_synonyms[target])
+            db.osmnodes.update(
+                    {
+                        "cuisine": {"$exists": True},
+                        "amenity": "restaurant",
+                        "cuisineTags": {"$in": cuisines_synonyms[target]}
+                    },
+                    {
+                        "$pullAll": { "cusineTags": cuisines_synonyms[target] },
+                        "$addToSet": { "cuisineTags": [ target ] }
+                    },
+                    multi=False
+                )
+        print "Done."
+
+
 def clean_phones_parse(db):
     records = audit_phone_numbers(db.osmnodes)
     pos = pandas.DataFrame(columns = [ 'phone' , 'country' , 'area' , 'number', 'normalized' ])
@@ -77,8 +125,12 @@ def clean_map(mongoServer, mongoPort, csvFilePattern, csvEncoding, debug):
     db = client.udacity
     #c = client.udacity.osmnodes
     print
-    print "Cleaning phone numbers."
-    clean_phones(db, debug, csvFilePattern, csvEncoding)
-    print
-    print "Done cleaning phone numbers."
+    print "Cleaning cuisines."
+    clean_cuisines(db, debug, csvFilePattern, csvEncoding)
+    print "Done cleaning cuisines."
+    #print
+    #print "Cleaning phone numbers."
+    #clean_phones(db, debug, csvFilePattern, csvEncoding)
+    #print
+    #print "Done cleaning phone numbers."
     

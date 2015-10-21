@@ -191,8 +191,8 @@ div#notebook {
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Abstract">Abstract<a class="anchor-link" href="#Abstract">&#182;</a></h2><p>This paper describes describes the process of downloading, analyzing and cleaning of an OpenStreet Map data set of my former home town as a student: <a href="https://en.wikipedia.org/wiki/Dresden">Dresden</a>, a state capital in eastern Germany, <a href="https://www.google.de/search?q=dresden&newwindow=1&es_sm=122&source=lnms&tbm=isch&sa=X&ved=0CAkQ_AUoA2oVChMIrc3d_cT3xwIVh2fbCh3Y6QYu&biw=1920&bih=969">a baroque town beautifully located on the board of the river Elbe</a> and town home to a high-tech conglomerate from the micro-electronics sector called <a href="https://en.wikipedia.org/wiki/Silicon_Saxony">Silicon Saxony</a>.</p>
-<p>In this paper, first, the pipeline (and python script) to perform retrieval, analysis and cleaning of the data is introduced (chapters <a href="#Approach">Approach</a>) and results of the analysis stage are presented (chapters <a href="#Data-Format">Data Format</a>, <a href="#Descriptive-Statistics">Descriptive Statistics</a>, <a href="#Data-Quality">Data Quality</a>). Especially during the Descriptive Statistics analysis, interesting facts of Dresden are uncovered, like the most popular religion, sport, beer, cuisine or leisure activity.</p>
-<p>For the cleaning stage, canonicalizing phone numbers present in the data set was the challange of choice, since the originally proposed method of cleaning street names was not applicable for this data set (chapter <a href="#Cleaning-Phone-Numbers">Cleaning Phone Numbers</a>). The paper is finally concluded with some further ideas (chapter <a href="#Conclusion-and-Further-Ideas">Conclusion and Further Ideas</a>).</p>
+<p>In this paper, first, the pipeline (and python script) to perform retrieval, analysis and cleaning of the data is introduced (chapters <a href="#Approach">Approach</a>) and results of the analysis stage are presented (chapter <a href="#Overview-of-the-Data">Overview of the Data</a>). During the analysis, interesting facts of Dresden are uncovered, like the most popular religion, sport, beer, cuisine or leisure activity.</p>
+<p>For the cleaning stage (chapter <a href="#Problems-Encountered-in-the-Map-/-Data-Quality">Problems Encountered in the Map</a>), canonicalizing phone numbers present in the data set and unifying cuisine classifications where the challenge of choice. Some other cleaning techniques like cleaning street names and post codes where tried, but proved not fruitful. The paper is finally concluded with some further ideas for data set cleaning (chapter <a href="#Other-Ideas-about-the-Data-Set">Other Ideas about the Data Set</a>).</p>
 
 </div>
 </div>
@@ -202,16 +202,18 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="The-Approach">The Approach<a class="anchor-link" href="#The-Approach">&#182;</a></h2><p>I implemented retrieving / storing / analysing and cleaning in a python script. The script can be called like so:</p>
+<h2 id="The-Approach">The Approach<a class="anchor-link" href="#The-Approach">&#182;</a></h2><p>I implemented retrieving / storing / analysing and cleaning in a python script. The script can be used like this:</p>
 
 <pre><code># python project.py
 Usage:
   python project.py -d    Download &amp; unpack bz2 file to OSM file (experimental)
   python project.py -p    Process OSM file and write JSON file
   python project.py -w    Write JSON file to MongoDB
+  python project.py -z    Download and install the zipcode helpers"
   python project.py -f    Audit format / structure of data
   python project.py -s    Audit statistics of data
   python project.py -q    Audit quality of data
+  python project.py -Z    Audit quality of data: Zipcodes - (see -z option)
   python project.py -c    Clean data in MongoDB
   python project.py -C    Clean data debug mode - don't actually write to DB</code></pre>
 <p>Different options can be combined, so <code>python project.py -dpwfsqc</code> will do the whole round trip. During the process, I re-used most of the code and data format developed during the "Data Wrangling With MongoDB" Udacity course. For example, the data format used for storing the data (<code>-p</code> and <code>-w</code> option) is completely based on <a href="https://www.udacity.com/course/viewer#!/c-ud032/l-768058569">Lesson 6</a>  - with some fine-tuning.</p>
@@ -225,13 +227,13 @@ Usage:
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Data-Format">Data Format<a class="anchor-link" href="#Data-Format">&#182;</a></h2><p><strong>Note:</strong> Use <code>python project.py -f</code> to obtain the data for this chapter. This is a long-running process which might take a few hours to complete! There is an output file written to <a href="Project/data/audit_format_map.csv"><code>Project/data/audit_format_map.csv</code></a> which can be beautified into an <a href="Project/data/audit_format_map.xlsx">Excel spreadsheet</a>.</p>
+<h3 id="Data-Format">Data Format<a class="anchor-link" href="#Data-Format">&#182;</a></h3><p><strong>Try it out:</strong> Use <code>python project.py -f</code> to obtain the data for this chapter. This is a long-running process which might take a few hours to complete! There is an output file written to <a href="Project/data/audit_format_map.csv"><code>Project/data/audit_format_map.csv</code></a> which can be beautified into an <a href="Project/data/audit_format_map.xlsx">Excel spreadsheet</a>.</p>
 <p><img src="audit_format.png" alt="A picture of the excel spreadsheet audit_format.xlsx"></p>
 <p>First, the data format was audited, which consisted of going through all the documents and aggregating the occurence of any attributes and the prevalence of their types (<code>str</code>ing, <code>int</code>eger, <code>float</code> and <code>other</code>). For this, batches of 1000 documents each are retrieved from the collection and each combed through by the python code while a Python Dataframe keeps track of the counters. Since there are 1,360,000 elements, this process takes many hours; an alternative would be to run the query natively in JavaScript code on the MongoDB shell or to issue the command as a BSON command.</p>
-<p>The overview of the format showed no obvious big problems with the data at first glance but provided valuable insights for further analysis, especially to query <a href="#Descriptive-Statistics">Descriptive Statistics</a>. Some further interesting insights:</p>
+<p>The overview of the format showed no obvious big problems with the data at first glance but provided some valuable insights:</p>
 <ul>
 <li>One area of improvement could be the phone number, which is scattered across multiple data fields (<code>address:phone</code>, <code>phone</code> and <code>phone_mobile</code>) and was identified as a potential candidate for cleaning (see <a href="#Auditing-Phone-Numbers">Auditing Phone Numbers</a> and <a href="#Cleaning-Phone-Numbers">Cleaning Phone Numbers</a>).</li>
-<li>Also, it is evident that some values are present in the dataset as sometimes <code>str</code>ing, othertimes numeric: The XML parsing process takes care that each value is, whenever parsable, stored as integer or float. For attributes like street numbers, mixed occurences may be in the data set.</li>
+<li>Some values are present in the dataset as sometimes <code>str</code>ing, othertimes numeric: The XML parsing process takes care that each value is, whenever parsable, stored as integer or float. For attributes like street numbers, mixed occurences may be in the data set.</li>
 <li>This automatic parsing of <code>int</code> or <code>float</code> turned out to be not always useful: a problem are leading zeros which in certain cases hold semantics. For german phone numbers, a leading zero signifies the start of an area code (<code>0</code>) or the start of a country code (<code>00</code>). For german postcodes, a leading zero in a postcode represents the german state of Saxony. As an outcome of this insight, I changed the parsing routine of the XML data to only parse values as numeric, if they do not contain a leading zero (<code>not s.startswith("0")</code>)</li>
 <li>I checked some of the lesser-common values for sanity. E.g., there is a parameter <code>dogshit</code> which appears three times. As it turns out, this is not a prank of some map editors, who document dog feces they find in the area, but an indication about whether a public trash can contains a dispenser of plastic bags for relevant situations.</li>
 </ul>
@@ -244,11 +246,66 @@ Usage:
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Descriptive-Statistics">Descriptive Statistics<a class="anchor-link" href="#Descriptive-Statistics">&#182;</a></h2><p><strong>Note:</strong> Use <code>python project.py -s</code> to obtain the data for this chapter. See Sample Output in file <a href="Project/output_project.py_-s.txt"><code>Project/output_project.py_-s.txt</code></a>.</p>
-<p>A couple of basic MongoDB queries were run to explore the data set based on the knowledge of its format from the previous chapter. The queries produce mostly rankings of values for certain data fields. Some of them are subsequently also visualized in a ggplot graph (png file) drawing on the skill set gained in <a href="https://www.udacity.com/course/viewer#!/c-ud359/l-692548568">Udacity's Intro to Data Science course, Lesson 4: Data Visualization</a> while not too much effort was put in making the graphs look particularily beautiful. The graphs are located in <code>Project/data/stats_*.png</code>.</p>
+<h2 id="Overview-of-the-Data">Overview of the Data<a class="anchor-link" href="#Overview-of-the-Data">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><strong>Try it out:</strong> Use <code>python project.py -s</code> to obtain the data for this chapter. See Sample Output in file <a href="Project/output_project.py_-s.txt"><code>Project/output_project.py_-s.txt</code></a>.</p>
+<p>A couple of basic MongoDB queries were run to explore the data set based on the knowledge of its format from the previous chapter. The queries produce mostly rankings of values for certain data fields. Some of them are subsequently also visualized in a ggplot graph (png file) relying on the skill set gained in <a href="https://www.udacity.com/course/viewer#!/c-ud359/l-692548568">Udacity's Intro to Data Science course, Lesson 4: Data Visualization</a> while not too much effort was put in making the graphs look particularily beautiful. The graphs are located in <code>Project/data/stats_*.png</code>.</p>
 
 </div>
 </div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Filesize,-Number-of-Nodes-and-Ways">Filesize, Number of Nodes and Ways<a class="anchor-link" href="#Filesize,-Number-of-Nodes-and-Ways">&#182;</a></h3><p>The total file size of the OSM export is 281.778.428 Bytes, there are 208813 nodes and 1146807 ways in the dataset.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[15]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span class="kn">from</span> <span class="nn">Project.notebook_stub</span> <span class="kn">import</span> <span class="n">project_coll</span>
+<span class="kn">import</span> <span class="nn">pprint</span>
+
+<span class="c"># Query used - see function Project.audit_stats_map.stats_general</span>
+<span class="n">pipeline</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">{</span><span class="s">&quot;$group&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;_id&quot;</span><span class="p">:</span> <span class="s">&quot;$type&quot;</span><span class="p">,</span> <span class="s">&quot;count&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;$sum&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}}},</span>
+        <span class="p">{</span><span class="s">&quot;$match&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;_id&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;$in&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s">&quot;node&quot;</span><span class="p">,</span> <span class="s">&quot;way&quot;</span><span class="p">]}}}</span>
+    <span class="p">]</span>
+<span class="n">l</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">project_coll</span><span class="o">.</span><span class="n">aggregate</span><span class="p">(</span><span class="n">pipeline</span><span class="p">))</span>
+<span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[{u&apos;_id&apos;: u&apos;way&apos;, u&apos;count&apos;: 209356}, {u&apos;_id&apos;: u&apos;node&apos;, u&apos;count&apos;: 1148321}]
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
 </div>
 <div class="cell border-box-sizing text_cell rendered">
 <div class="prompt input_prompt">
@@ -262,20 +319,21 @@ Usage:
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="prompt input_prompt">In&nbsp;[16]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="kn">from</span> <span class="nn">Project.notebook_stub</span> <span class="kn">import</span> <span class="n">project_coll</span>
 <span class="kn">import</span> <span class="nn">pprint</span>
 
 <span class="c"># Query used - see function: Project.audit_stats_map.stats_users(...):</span>
-<span class="n">l</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">project_coll</span><span class="o">.</span><span class="n">aggregate</span><span class="p">([</span>
-            <span class="p">{</span><span class="s">&quot;$match&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;created.user&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;$exists&quot;</span><span class="p">:</span> <span class="bp">True</span><span class="p">}}},</span>
-            <span class="p">{</span><span class="s">&quot;$group&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;_id&quot;</span><span class="p">:</span> <span class="s">&quot;$created.user&quot;</span><span class="p">,</span> <span class="s">&quot;count&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;$sum&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}}},</span>
-            <span class="p">{</span><span class="s">&quot;$sort&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;count&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">}}</span>
-        <span class="p">]))</span>
+<span class="n">pipeline</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">{</span><span class="s">&quot;$match&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;created.user&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;$exists&quot;</span><span class="p">:</span> <span class="bp">True</span><span class="p">}}},</span>
+        <span class="p">{</span><span class="s">&quot;$group&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;_id&quot;</span><span class="p">:</span> <span class="s">&quot;$created.user&quot;</span><span class="p">,</span> <span class="s">&quot;count&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;$sum&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}}},</span>
+        <span class="p">{</span><span class="s">&quot;$sort&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;count&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">}}</span>
+    <span class="p">]</span>
+<span class="n">l</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">project_coll</span><span class="o">.</span><span class="n">aggregate</span><span class="p">(</span><span class="n">pipeline</span><span class="p">))</span>
 <span class="k">print</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">l</span><span class="p">))</span> <span class="o">+</span> <span class="s">&quot; users were involved:&quot;</span>
-<span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">10</span><span class="p">]</span><span class="o">+</span><span class="p">[</span><span class="s">&quot;...&quot;</span><span class="p">]</span><span class="o">+</span><span class="n">l</span><span class="p">[</span><span class="o">-</span><span class="mi">10</span><span class="p">:])</span>
+<span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">5</span><span class="p">]</span><span class="o">+</span><span class="p">[</span><span class="s">&quot;...&quot;</span><span class="p">]</span><span class="o">+</span><span class="n">l</span><span class="p">[</span><span class="o">-</span><span class="mi">5</span><span class="p">:])</span>
 </pre></div>
 
 </div>
@@ -293,17 +351,7 @@ Usage:
  {u&apos;_id&apos;: u&apos;NESDD&apos;, u&apos;count&apos;: 79159},
  {u&apos;_id&apos;: u&apos;Thomas8122&apos;, u&apos;count&apos;: 75621},
  {u&apos;_id&apos;: u&apos;stw1701&apos;, u&apos;count&apos;: 57403},
- {u&apos;_id&apos;: u&apos;Wurgwitz&apos;, u&apos;count&apos;: 33881},
- {u&apos;_id&apos;: u&apos;iknopf&apos;, u&apos;count&apos;: 33364},
- {u&apos;_id&apos;: u&apos;vaust&apos;, u&apos;count&apos;: 31138},
- {u&apos;_id&apos;: u&apos;ubahnverleih&apos;, u&apos;count&apos;: 29756},
- {u&apos;_id&apos;: u&apos;master&apos;, u&apos;count&apos;: 28207},
  &apos;...&apos;,
- {u&apos;_id&apos;: u&apos;freidageorgi&apos;, u&apos;count&apos;: 1},
- {u&apos;_id&apos;: u&apos;kswim&apos;, u&apos;count&apos;: 1},
- {u&apos;_id&apos;: u&apos;itiboi&apos;, u&apos;count&apos;: 1},
- {u&apos;_id&apos;: u&apos;oliverlindner&apos;, u&apos;count&apos;: 1},
- {u&apos;_id&apos;: u&apos;diemirk&apos;, u&apos;count&apos;: 1},
  {u&apos;_id&apos;: u&apos;chkr&apos;, u&apos;count&apos;: 1},
  {u&apos;_id&apos;: u&apos;The King&apos;, u&apos;count&apos;: 1},
  {u&apos;_id&apos;: u&apos;mowsw&apos;, u&apos;count&apos;: 1},
@@ -329,19 +377,20 @@ Usage:
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[12]:</div>
+<div class="prompt input_prompt">In&nbsp;[17]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="kn">from</span> <span class="nn">Project.notebook_stub</span> <span class="kn">import</span> <span class="n">project_coll</span>
 <span class="kn">import</span> <span class="nn">pprint</span>
 
 <span class="c"># Query used - see function: Project.audit_stats_map.stats_amenities(...):</span>
-<span class="n">l</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">project_coll</span><span class="o">.</span><span class="n">aggregate</span><span class="p">([</span>
-            <span class="p">{</span><span class="s">&quot;$match&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;amenity&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;$exists&quot;</span><span class="p">:</span> <span class="bp">True</span><span class="p">}}},</span>
-            <span class="p">{</span><span class="s">&quot;$group&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;_id&quot;</span><span class="p">:</span> <span class="s">&quot;$amenity&quot;</span><span class="p">,</span> <span class="s">&quot;count&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;$sum&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}}},</span>
-            <span class="p">{</span><span class="s">&quot;$sort&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;count&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">}}</span>
-        <span class="p">]))</span>
-<span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">20</span><span class="p">]</span><span class="o">+</span><span class="p">[</span><span class="s">&#39;...&#39;</span><span class="p">])</span>
+<span class="n">pipeline</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">{</span><span class="s">&quot;$match&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;amenity&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;$exists&quot;</span><span class="p">:</span> <span class="bp">True</span><span class="p">}}},</span>
+        <span class="p">{</span><span class="s">&quot;$group&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;_id&quot;</span><span class="p">:</span> <span class="s">&quot;$amenity&quot;</span><span class="p">,</span> <span class="s">&quot;count&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;$sum&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}}},</span>
+        <span class="p">{</span><span class="s">&quot;$sort&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;count&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">}}</span>
+    <span class="p">]</span>
+<span class="n">l</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">project_coll</span><span class="o">.</span><span class="n">aggregate</span><span class="p">(</span><span class="n">pipeline</span><span class="p">))</span>
+<span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">10</span><span class="p">]</span><span class="o">+</span><span class="p">[</span><span class="s">&#39;...&#39;</span><span class="p">])</span>
 </pre></div>
 
 </div>
@@ -363,16 +412,6 @@ Usage:
  {u&apos;_id&apos;: u&apos;waste_basket&apos;, u&apos;count&apos;: 536},
  {u&apos;_id&apos;: u&apos;fast_food&apos;, u&apos;count&apos;: 330},
  {u&apos;_id&apos;: u&apos;telephone&apos;, u&apos;count&apos;: 329},
- {u&apos;_id&apos;: u&apos;kindergarten&apos;, u&apos;count&apos;: 322},
- {u&apos;_id&apos;: u&apos;school&apos;, u&apos;count&apos;: 282},
- {u&apos;_id&apos;: u&apos;cafe&apos;, u&apos;count&apos;: 268},
- {u&apos;_id&apos;: u&apos;hunting_stand&apos;, u&apos;count&apos;: 192},
- {u&apos;_id&apos;: u&apos;doctors&apos;, u&apos;count&apos;: 171},
- {u&apos;_id&apos;: u&apos;grit_bin&apos;, u&apos;count&apos;: 158},
- {u&apos;_id&apos;: u&apos;pharmacy&apos;, u&apos;count&apos;: 150},
- {u&apos;_id&apos;: u&apos;place_of_worship&apos;, u&apos;count&apos;: 150},
- {u&apos;_id&apos;: u&apos;fountain&apos;, u&apos;count&apos;: 133},
- {u&apos;_id&apos;: u&apos;pub&apos;, u&apos;count&apos;: 131},
  &apos;...&apos;]
 </pre>
 </div>
@@ -394,19 +433,20 @@ Usage:
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[15]:</div>
+<div class="prompt input_prompt">In&nbsp;[18]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="kn">from</span> <span class="nn">Project.notebook_stub</span> <span class="kn">import</span> <span class="n">project_coll</span>
 <span class="kn">import</span> <span class="nn">pprint</span>
 
 <span class="c"># Query used - see function: Project.audit_stats_map.stats_amenities(...):</span>
-<span class="n">l</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">project_coll</span><span class="o">.</span><span class="n">aggregate</span><span class="p">([</span>
-            <span class="p">{</span><span class="s">&quot;$match&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;leisure&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;$exists&quot;</span><span class="p">:</span> <span class="bp">True</span><span class="p">}}},</span>
-            <span class="p">{</span><span class="s">&quot;$group&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;_id&quot;</span><span class="p">:</span> <span class="s">&quot;$leisure&quot;</span><span class="p">,</span> <span class="s">&quot;count&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;$sum&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}}},</span>
-            <span class="p">{</span><span class="s">&quot;$sort&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;count&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">}}</span>
-        <span class="p">]))</span>
-<span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">20</span><span class="p">]</span><span class="o">+</span><span class="p">[</span><span class="s">&#39;...&#39;</span><span class="p">])</span>
+<span class="n">pipeline</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">{</span><span class="s">&quot;$match&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;leisure&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;$exists&quot;</span><span class="p">:</span> <span class="bp">True</span><span class="p">}}},</span>
+        <span class="p">{</span><span class="s">&quot;$group&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;_id&quot;</span><span class="p">:</span> <span class="s">&quot;$leisure&quot;</span><span class="p">,</span> <span class="s">&quot;count&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;$sum&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}}},</span>
+        <span class="p">{</span><span class="s">&quot;$sort&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;count&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">}}</span>
+    <span class="p">]</span>
+<span class="n">l</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">project_coll</span><span class="o">.</span><span class="n">aggregate</span><span class="p">(</span><span class="n">pipeline</span><span class="p">))</span>
+<span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">10</span><span class="p">]</span><span class="o">+</span><span class="p">[</span><span class="s">&#39;...&#39;</span><span class="p">])</span>
 </pre></div>
 
 </div>
@@ -428,16 +468,6 @@ Usage:
  {u&apos;_id&apos;: u&apos;dance&apos;, u&apos;count&apos;: 23},
  {u&apos;_id&apos;: u&apos;water_park&apos;, u&apos;count&apos;: 22},
  {u&apos;_id&apos;: u&apos;stadium&apos;, u&apos;count&apos;: 19},
- {u&apos;_id&apos;: u&apos;table_tennis_table&apos;, u&apos;count&apos;: 17},
- {u&apos;_id&apos;: u&apos;marina&apos;, u&apos;count&apos;: 10},
- {u&apos;_id&apos;: u&apos;point_of_interest&apos;, u&apos;count&apos;: 9},
- {u&apos;_id&apos;: u&apos;common&apos;, u&apos;count&apos;: 8},
- {u&apos;_id&apos;: u&apos;slipway&apos;, u&apos;count&apos;: 8},
- {u&apos;_id&apos;: u&apos;horse_riding&apos;, u&apos;count&apos;: 7},
- {u&apos;_id&apos;: u&apos;nature_reserve&apos;, u&apos;count&apos;: 7},
- {u&apos;_id&apos;: u&apos;picnic_table&apos;, u&apos;count&apos;: 7},
- {u&apos;_id&apos;: u&apos;recreation_ground&apos;, u&apos;count&apos;: 6},
- {u&apos;_id&apos;: u&apos;dog_park&apos;, u&apos;count&apos;: 3},
  &apos;...&apos;]
 </pre>
 </div>
@@ -459,18 +489,19 @@ Usage:
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[17]:</div>
+<div class="prompt input_prompt">In&nbsp;[19]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="kn">from</span> <span class="nn">Project.notebook_stub</span> <span class="kn">import</span> <span class="n">project_coll</span>
 <span class="kn">import</span> <span class="nn">pprint</span>
 
 <span class="c"># Query used - see function: Project.audit_stats_map.stats_religions(...):</span>
-<span class="n">l</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">project_coll</span><span class="o">.</span><span class="n">aggregate</span><span class="p">([</span>
-            <span class="p">{</span><span class="s">&quot;$match&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;amenity&quot;</span><span class="p">:{</span><span class="s">&quot;$in&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s">&quot;place_of_worship&quot;</span><span class="p">,</span><span class="s">&quot;community_center&quot;</span><span class="p">]}}},</span>
-            <span class="p">{</span><span class="s">&quot;$group&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;_id&quot;</span><span class="p">:</span> <span class="s">&quot;$religion&quot;</span><span class="p">,</span> <span class="s">&quot;count&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;$sum&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}}},</span>
-            <span class="p">{</span><span class="s">&quot;$sort&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;count&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">}}</span>
-        <span class="p">]))</span>
+<span class="n">pipeline</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">{</span><span class="s">&quot;$match&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;amenity&quot;</span><span class="p">:{</span><span class="s">&quot;$in&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s">&quot;place_of_worship&quot;</span><span class="p">,</span><span class="s">&quot;community_center&quot;</span><span class="p">]}}},</span>
+        <span class="p">{</span><span class="s">&quot;$group&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;_id&quot;</span><span class="p">:</span> <span class="s">&quot;$religion&quot;</span><span class="p">,</span> <span class="s">&quot;count&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;$sum&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}}},</span>
+        <span class="p">{</span><span class="s">&quot;$sort&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;count&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">}}</span>
+    <span class="p">]</span>
+<span class="n">l</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">project_coll</span><span class="o">.</span><span class="n">aggregate</span><span class="p">(</span><span class="n">pipeline</span><span class="p">))</span>
 <span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
 </pre></div>
 
@@ -510,19 +541,20 @@ Usage:
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[18]:</div>
+<div class="prompt input_prompt">In&nbsp;[20]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="kn">from</span> <span class="nn">Project.notebook_stub</span> <span class="kn">import</span> <span class="n">project_coll</span>
 <span class="kn">import</span> <span class="nn">pprint</span>
 
 <span class="c"># Query used - see function: Project.audit_stats_map.stats_cuisines(...):</span>
-<span class="n">l</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">project_coll</span><span class="o">.</span><span class="n">aggregate</span><span class="p">([</span>
-            <span class="p">{</span><span class="s">&quot;$match&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;amenity&quot;</span><span class="p">:</span> <span class="s">&quot;restaurant&quot;</span><span class="p">}},</span>
-            <span class="p">{</span><span class="s">&quot;$group&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;_id&quot;</span><span class="p">:</span> <span class="s">&quot;$cuisine&quot;</span><span class="p">,</span> <span class="s">&quot;count&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;$sum&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}}},</span>
-            <span class="p">{</span><span class="s">&quot;$sort&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;count&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">}}</span>
-        <span class="p">]))</span>
-<span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
+<span class="n">pipeline</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">{</span><span class="s">&quot;$match&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;amenity&quot;</span><span class="p">:</span> <span class="s">&quot;restaurant&quot;</span><span class="p">}},</span>
+        <span class="p">{</span><span class="s">&quot;$group&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;_id&quot;</span><span class="p">:</span> <span class="s">&quot;$cuisine&quot;</span><span class="p">,</span> <span class="s">&quot;count&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;$sum&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}}},</span>
+        <span class="p">{</span><span class="s">&quot;$sort&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;count&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">}}</span>
+    <span class="p">]</span>
+<span class="n">l</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">project_coll</span><span class="o">.</span><span class="n">aggregate</span><span class="p">(</span><span class="n">pipeline</span><span class="p">))</span>
+<span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">10</span><span class="p">]</span><span class="o">+</span><span class="p">[</span><span class="s">&#39;...&#39;</span><span class="p">])</span>
 </pre></div>
 
 </div>
@@ -535,8 +567,7 @@ Usage:
 
 <div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>[{u&apos;_id&apos;: None, u&apos;count&apos;: 299},
- {u&apos;_id&apos;: u&apos;german&apos;, u&apos;count&apos;: 66},
+<pre>[{u&apos;_id&apos;: u&apos;german&apos;, u&apos;count&apos;: 66},
  {u&apos;_id&apos;: u&apos;regional&apos;, u&apos;count&apos;: 56},
  {u&apos;_id&apos;: u&apos;italian&apos;, u&apos;count&apos;: 52},
  {u&apos;_id&apos;: u&apos;greek&apos;, u&apos;count&apos;: 28},
@@ -545,55 +576,7 @@ Usage:
  {u&apos;_id&apos;: u&apos;chinese&apos;, u&apos;count&apos;: 12},
  {u&apos;_id&apos;: u&apos;international&apos;, u&apos;count&apos;: 11},
  {u&apos;_id&apos;: u&apos;indian&apos;, u&apos;count&apos;: 11},
- {u&apos;_id&apos;: u&apos;spanish&apos;, u&apos;count&apos;: 8},
- {u&apos;_id&apos;: u&apos;vietnamese&apos;, u&apos;count&apos;: 6},
- {u&apos;_id&apos;: u&apos;thai&apos;, u&apos;count&apos;: 5},
- {u&apos;_id&apos;: u&apos;steak_house&apos;, u&apos;count&apos;: 5},
- {u&apos;_id&apos;: u&apos;sushi&apos;, u&apos;count&apos;: 5},
- {u&apos;_id&apos;: u&apos;russian&apos;, u&apos;count&apos;: 4},
- {u&apos;_id&apos;: u&apos;american&apos;, u&apos;count&apos;: 4},
- {u&apos;_id&apos;: u&apos;kebab&apos;, u&apos;count&apos;: 4},
- {u&apos;_id&apos;: u&apos;african&apos;, u&apos;count&apos;: 3},
- {u&apos;_id&apos;: u&apos;japanese&apos;, u&apos;count&apos;: 3},
- {u&apos;_id&apos;: u&apos;turkish&apos;, u&apos;count&apos;: 3},
- {u&apos;_id&apos;: u&apos;french&apos;, u&apos;count&apos;: 3},
- {u&apos;_id&apos;: u&apos;mediterranean&apos;, u&apos;count&apos;: 3},
- {u&apos;_id&apos;: u&apos;fish&apos;, u&apos;count&apos;: 2},
- {u&apos;_id&apos;: u&apos;hungarian&apos;, u&apos;count&apos;: 2},
- {u&apos;_id&apos;: u&apos;mexican&apos;, u&apos;count&apos;: 2},
- {u&apos;_id&apos;: u&apos;italian;pizza&apos;, u&apos;count&apos;: 2},
- {u&apos;_id&apos;: u&apos;czech&apos;, u&apos;count&apos;: 2},
- {u&apos;_id&apos;: u&apos;croatian&apos;, u&apos;count&apos;: 2},
- {u&apos;_id&apos;: u&apos;korean&apos;, u&apos;count&apos;: 2},
- {u&apos;_id&apos;: u&apos;schnitzel&apos;, u&apos;count&apos;: 2},
- {u&apos;_id&apos;: u&apos;cuban&apos;, u&apos;count&apos;: 2},
- {u&apos;_id&apos;: u&apos;pasta&apos;, u&apos;count&apos;: 2},
- {u&apos;_id&apos;: u&apos;Vollwert&apos;, u&apos;count&apos;: 2},
- {u&apos;_id&apos;: u&apos;seafood&apos;, u&apos;count&apos;: 2},
- {u&apos;_id&apos;: u&apos;indian;pizza&apos;, u&apos;count&apos;: 1},
- {u&apos;_id&apos;: u&apos;vegan&apos;, u&apos;count&apos;: 1},
- {u&apos;_id&apos;: u&apos;syrian&apos;, u&apos;count&apos;: 1},
- {u&apos;_id&apos;: u&apos;soup&apos;, u&apos;count&apos;: 1},
- {u&apos;_id&apos;: u&apos;saxony&apos;, u&apos;count&apos;: 1},
- {u&apos;_id&apos;: u&apos;kebab;pizza&apos;, u&apos;count&apos;: 1},
- {u&apos;_id&apos;: u&apos;lebanese&apos;, u&apos;count&apos;: 1},
- {u&apos;_id&apos;: u&apos;buschenschank&apos;, u&apos;count&apos;: 1},
- {u&apos;_id&apos;: u&apos;Portugiesisches_Restaurant_&amp;_Weinbar&apos;, u&apos;count&apos;: 1},
- {u&apos;_id&apos;: u&apos;arab&apos;, u&apos;count&apos;: 1},
- {u&apos;_id&apos;: u&apos;burger&apos;, u&apos;count&apos;: 1},
- {u&apos;_id&apos;: u&apos;sudanese;arabic&apos;, u&apos;count&apos;: 1},
- {u&apos;_id&apos;: u&apos;german;balkan&apos;, u&apos;count&apos;: 1},
- {u&apos;_id&apos;: u&apos;chinese;asian;thai&apos;, u&apos;count&apos;: 1},
- {u&apos;_id&apos;: u&apos;curry&apos;, u&apos;count&apos;: 1},
- {u&apos;_id&apos;: u&apos;canadian&apos;, u&apos;count&apos;: 1},
- {u&apos;_id&apos;: u&apos;organic&apos;, u&apos;count&apos;: 1},
- {u&apos;_id&apos;: u&apos;austrian&apos;, u&apos;count&apos;: 1},
- {u&apos;_id&apos;: u&apos;modern&apos;, u&apos;count&apos;: 1},
- {u&apos;_id&apos;: u&apos;thai;vietnamese&apos;, u&apos;count&apos;: 1},
- {u&apos;_id&apos;: u&apos;regional, tuscany&apos;, u&apos;count&apos;: 1},
- {u&apos;_id&apos;: u&apos;pizza;kebab&apos;, u&apos;count&apos;: 1},
- {u&apos;_id&apos;: u&apos;home_style_cooking&apos;, u&apos;count&apos;: 1},
- {u&apos;_id&apos;: u&apos;brazilian&apos;, u&apos;count&apos;: 1}]
+ &apos;...&apos;]
 </pre>
 </div>
 </div>
@@ -614,18 +597,19 @@ Usage:
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[19]:</div>
+<div class="prompt input_prompt">In&nbsp;[21]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="kn">from</span> <span class="nn">Project.notebook_stub</span> <span class="kn">import</span> <span class="n">project_coll</span>
 <span class="kn">import</span> <span class="nn">pprint</span>
 
 <span class="c"># Query used - see function: Project.audit_stats_map.stats_beers(...):</span>
-<span class="n">l</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">project_coll</span><span class="o">.</span><span class="n">aggregate</span><span class="p">([</span>
-            <span class="p">{</span><span class="s">&quot;$match&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;amenity&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;$in&quot;</span><span class="p">:[</span><span class="s">&quot;pub&quot;</span><span class="p">,</span><span class="s">&quot;bar&quot;</span><span class="p">,</span><span class="s">&quot;restaurant&quot;</span><span class="p">]}}},</span>
-            <span class="p">{</span><span class="s">&quot;$group&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;_id&quot;</span><span class="p">:</span> <span class="s">&quot;$brewery&quot;</span><span class="p">,</span> <span class="s">&quot;count&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;$sum&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}}},</span>
-            <span class="p">{</span><span class="s">&quot;$sort&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;count&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">}}</span>
-        <span class="p">]))</span>
+<span class="n">pipeline</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">{</span><span class="s">&quot;$match&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;amenity&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;$in&quot;</span><span class="p">:[</span><span class="s">&quot;pub&quot;</span><span class="p">,</span><span class="s">&quot;bar&quot;</span><span class="p">,</span><span class="s">&quot;restaurant&quot;</span><span class="p">]}}},</span>
+        <span class="p">{</span><span class="s">&quot;$group&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;_id&quot;</span><span class="p">:</span> <span class="s">&quot;$brewery&quot;</span><span class="p">,</span> <span class="s">&quot;count&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;$sum&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}}},</span>
+        <span class="p">{</span><span class="s">&quot;$sort&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;count&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">}}</span>
+    <span class="p">]</span>
+<span class="n">l</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">project_coll</span><span class="o">.</span><span class="n">aggregate</span><span class="p">(</span><span class="n">pipeline</span><span class="p">))</span>
 <span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
 </pre></div>
 
@@ -675,19 +659,20 @@ Usage:
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[20]:</div>
+<div class="prompt input_prompt">In&nbsp;[22]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="kn">from</span> <span class="nn">Project.notebook_stub</span> <span class="kn">import</span> <span class="n">project_coll</span>
 <span class="kn">import</span> <span class="nn">pprint</span>
 
 <span class="c"># Query used - see function: Project.audit_stats_map.stats_sports(...):</span>
-<span class="n">l</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">project_coll</span><span class="o">.</span><span class="n">aggregate</span><span class="p">([</span>
-            <span class="p">{</span><span class="s">&quot;$match&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;leisure&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;$in&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s">&quot;sports_centre&quot;</span><span class="p">,</span><span class="s">&quot;stadium&quot;</span><span class="p">]}}},</span>
-            <span class="p">{</span><span class="s">&quot;$group&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;_id&quot;</span><span class="p">:</span> <span class="s">&quot;$sport&quot;</span><span class="p">,</span> <span class="s">&quot;count&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;$sum&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}}},</span>
-            <span class="p">{</span><span class="s">&quot;$sort&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;count&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">}}</span>
-        <span class="p">]))</span>
-<span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
+<span class="n">pipeline</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">{</span><span class="s">&quot;$match&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;leisure&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;$in&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s">&quot;sports_centre&quot;</span><span class="p">,</span><span class="s">&quot;stadium&quot;</span><span class="p">]}}},</span>
+        <span class="p">{</span><span class="s">&quot;$group&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;_id&quot;</span><span class="p">:</span> <span class="s">&quot;$sport&quot;</span><span class="p">,</span> <span class="s">&quot;count&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;$sum&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}}},</span>
+        <span class="p">{</span><span class="s">&quot;$sort&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;count&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">}}</span>
+    <span class="p">]</span>
+<span class="n">l</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">project_coll</span><span class="o">.</span><span class="n">aggregate</span><span class="p">(</span><span class="n">pipeline</span><span class="p">))</span>
+<span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">5</span><span class="p">]</span><span class="o">+</span><span class="p">[</span><span class="s">&#39;...&#39;</span><span class="p">])</span>
 </pre></div>
 
 </div>
@@ -700,35 +685,11 @@ Usage:
 
 <div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>[{u&apos;_id&apos;: None, u&apos;count&apos;: 112},
- {u&apos;_id&apos;: u&apos;multi&apos;, u&apos;count&apos;: 55},
+<pre>[{u&apos;_id&apos;: u&apos;multi&apos;, u&apos;count&apos;: 55},
  {u&apos;_id&apos;: u&apos;9pin&apos;, u&apos;count&apos;: 5},
  {u&apos;_id&apos;: u&apos;soccer&apos;, u&apos;count&apos;: 5},
  {u&apos;_id&apos;: u&apos;climbing&apos;, u&apos;count&apos;: 4},
- {u&apos;_id&apos;: u&apos;gymnastics&apos;, u&apos;count&apos;: 4},
- {u&apos;_id&apos;: u&apos;equestrian&apos;, u&apos;count&apos;: 2},
- {u&apos;_id&apos;: u&apos;athletics&apos;, u&apos;count&apos;: 2},
- {u&apos;_id&apos;: u&apos;tennis&apos;, u&apos;count&apos;: 2},
- {u&apos;_id&apos;: u&apos;judo&apos;, u&apos;count&apos;: 2},
- {u&apos;_id&apos;: u&apos;taekwon_do&apos;, u&apos;count&apos;: 1},
- {u&apos;_id&apos;: u&apos;water_ski&apos;, u&apos;count&apos;: 1},
- {u&apos;_id&apos;: u&apos;table_tennis&apos;, u&apos;count&apos;: 1},
- {u&apos;_id&apos;: u&apos;ice_hockey&apos;, u&apos;count&apos;: 1},
- {u&apos;_id&apos;: u&apos;dancing&apos;, u&apos;count&apos;: 1},
- {u&apos;_id&apos;: u&apos;canoe&apos;, u&apos;count&apos;: 1},
- {u&apos;_id&apos;: u&apos;fitness;matrial_arts&apos;, u&apos;count&apos;: 1},
- {u&apos;_id&apos;: u&apos;aikido&apos;, u&apos;count&apos;: 1},
- {u&apos;_id&apos;: u&apos;Karate&apos;, u&apos;count&apos;: 1},
- {u&apos;_id&apos;: u&apos;taekwondo&apos;, u&apos;count&apos;: 1},
- {u&apos;_id&apos;: u&apos;taekwon-do&apos;, u&apos;count&apos;: 1},
- {u&apos;_id&apos;: u&apos;volleyball&apos;, u&apos;count&apos;: 1},
- {u&apos;_id&apos;: u&apos;yoga&apos;, u&apos;count&apos;: 1},
- {u&apos;_id&apos;: u&apos;fitness&apos;, u&apos;count&apos;: 1},
- {u&apos;_id&apos;: u&apos;shooting&apos;, u&apos;count&apos;: 1},
- {u&apos;_id&apos;: u&apos;skateboard;bmx;unicycle&apos;, u&apos;count&apos;: 1},
- {u&apos;_id&apos;: u&apos;karate&apos;, u&apos;count&apos;: 1},
- {u&apos;_id&apos;: u&apos;swimming&apos;, u&apos;count&apos;: 1},
- {u&apos;_id&apos;: u&apos;10pin&apos;, u&apos;count&apos;: 1}]
+ &apos;...&apos;]
 </pre>
 </div>
 </div>
@@ -749,7 +710,7 @@ Usage:
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[21]:</div>
+<div class="prompt input_prompt">In&nbsp;[23]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="kn">from</span> <span class="nn">Project.notebook_stub</span> <span class="kn">import</span> <span class="n">project_coll</span>
@@ -757,7 +718,7 @@ Usage:
 
 <span class="c"># Query used - see function: Project.audit_stats_map.stats_dances(...):</span>
 <span class="n">l</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">project_coll</span><span class="o">.</span><span class="n">distinct</span><span class="p">(</span><span class="s">&quot;name&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s">&quot;leisure&quot;</span><span class="p">:</span> <span class="s">&quot;dance&quot;</span><span class="p">}))</span>
-<span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
+<span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">10</span><span class="p">]</span><span class="o">+</span><span class="p">[</span><span class="s">&#39;...&#39;</span><span class="p">])</span>
 </pre></div>
 
 </div>
@@ -770,8 +731,7 @@ Usage:
 
 <div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>[u&apos;Dancing Joy&apos;,
- u&apos;Tanzschule Graf&apos;,
+<pre>[u&apos;Tanzschule Graf&apos;,
  u&apos;Tanzschule Weise&apos;,
  u&apos;tres tangos&apos;,
  u&apos;Tango im Salon&apos;,
@@ -780,18 +740,7 @@ Usage:
  u&apos;Tanzschule Herrmann-Nebl&apos;,
  u&apos;Tanzstudio Sandana&apos;,
  u&apos;TSC Casino Dresden e.V.&apos;,
- u&apos;Tanzschule Nebl&apos;,
- u&apos;Tanzclub Galaxy Dresden&apos;,
- u&apos;Tanzsportklub RESIDENZ Dresden&apos;,
- u&apos;TC Saxonia&apos;,
- u&apos;Tanzschule Lax&apos;,
- u&apos;Gare de la lune&apos;,
- u&apos;Tanzhaus Dresden&apos;,
- u&apos;Tanzzentrum Dresden&apos;,
- u&apos;Milonga &amp; Wein&apos;,
- u&apos;ego-Wohlf\xfchlhaus&apos;,
- u&apos;Studio Fischer&apos;,
- u&apos;ADTV-Tanzschule Linhart&apos;]
+ &apos;...&apos;]
 </pre>
 </div>
 </div>
@@ -805,7 +754,7 @@ Usage:
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Data-Quality">Data Quality<a class="anchor-link" href="#Data-Quality">&#182;</a></h2><p><strong>Note</strong>: Use <code>python project.py -q</code> to obtain the data from this chapter. See Sample Output in file <a href="Project/data/audit_buildings.csv"><code>Project/output_project.py_-q.txt</code></a>. The script also writes a CSV file to <a href="Project/data/audit_buildings.csv"><code>Project/data/audit_buildings.csv</code></a>, which is also beautified into a <a href="Project/data/audit_buildings.xlsx">Excel File</a>.</p>
+<h2 id="Problems-Encountered-in-the-Map-/-Data-Quality">Problems Encountered in the Map / Data Quality<a class="anchor-link" href="#Problems-Encountered-in-the-Map-/-Data-Quality">&#182;</a></h2><p><strong>Try it out</strong>: Use <code>python project.py -q</code> to obtain the data from this chapter. See Sample Output in file <a href="Project/data/audit_buildings.csv"><code>Project/output_project.py_-q.txt</code></a>. The script also writes a CSV file to <a href="Project/data/audit_buildings.csv"><code>Project/data/audit_buildings.csv</code></a>, which is also beautified into a <a href="Project/data/audit_buildings.xlsx">Excel File</a>.</p>
 
 </div>
 </div>
@@ -815,27 +764,96 @@ Usage:
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Auditing-Street-Names">Auditing Street Names<a class="anchor-link" href="#Auditing-Street-Names">&#182;</a></h3><p>The first idea was to audit the map's street names analogous to how it was done in the Data Wrangling course: check, whether 'weird' street names occur, which do not end on a suffix like <code>street</code> (in German <code>-straße</code> or <code>Straße</code>, depending on whether it is a compound word or not), but in a abbreviation like <code>str.</code>. The following code snipped uses a MongoDB query with regular expression which returns all street names <u>not</u> ending with a particular suffix like <code>[Ss]traße</code> (street), <code>[Ww]eg</code> (way) etc. This is accomplished by a <a href="http://www.regular-expressions.info/lookaround.html">"negative lookbehind"</a> regex at the end of the regular expression: <code>(?&lt;!...)</code>, which essentially "looks back" at a position inside the text whether any text preceeding the current position <u>does not</u> match a predefined string. Using multiple of those lookbehinds in sequence allows to match exactly those street names, which do not match any of the predefined suffixes.</p>
+<h3 id="Leading-Zeros">Leading Zeros<a class="anchor-link" href="#Leading-Zeros">&#182;</a></h3><p>As already discussed, during the parsing stage, we are using an optimistic approach of parsing any numerical value as integer or float, if it is parsable as such. However, we noticed that we should <em>not</em> do this, if leading zeros are present as those hold semantics for phone numbers and zip codes. Otherwise, this cleaning approach gives us a much smaller representation of the data in MongoDB and in-memory.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Normalizing-/-Cleaning-Cuisines">Normalizing / Cleaning Cuisines<a class="anchor-link" href="#Normalizing-/-Cleaning-Cuisines">&#182;</a></h3><p>As hinted in section <a href="#Cuisines-in-Restaurants">Cuisines in Restaurant</a>, classification of cuisines is inconsistent. There are two problems with this value:</p>
+<ul>
+<li><p>There are multiple values separated by ';' which makes the parameter hard to parse. We overcome this by creating a parameter <code>cuisineTag</code> which stores the cuisine classifications as an array:</p>
+<div class="highlight"><pre><span class="n">db</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s">&#39;&#39;&#39;db.osmnodes.find({</span>
+<span class="s">                      &quot;cuisine&quot;: {&quot;$exists&quot;: true},</span>
+<span class="s">                      &quot;amenity&quot;: &quot;restaurant&quot;</span>
+<span class="s">                  }).snapshot().forEach(function(val, idx) {</span>
+<span class="s">                      val.cuisineTags = val.cuisine.split(&#39;;&#39;);</span>
+<span class="s">                      db.osmnodes.save(val)</span>
+<span class="s">                  })</span>
+<span class="s">           &#39;&#39;&#39;</span><span class="p">)</span>
+</pre></div>
+</li>
+<li><p>Some values are inconsistently used; therefore, we unify them with a mapping table and a subsequent MongoDB update:</p>
+<div class="highlight"><pre><span class="n">cuisines_synonyms</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&#39;german&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s">&#39;regional&#39;</span><span class="p">,</span> <span class="s">&#39;schnitzel&#39;</span><span class="p">,</span> <span class="s">&#39;buschenschank&#39;</span><span class="p">],</span>
+    <span class="s">&#39;portuguese&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s">&#39;Portugiesisches_Restaurant_&amp;_Weinbar&#39;</span><span class="p">],</span>
+    <span class="s">&#39;italian&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s">&#39;pizza&#39;</span><span class="p">,</span> <span class="s">&#39;pasta&#39;</span><span class="p">],</span>
+    <span class="s">&#39;mediterranean&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s">&#39;fish&#39;</span><span class="p">,</span> <span class="s">&#39;seafood&#39;</span><span class="p">],</span>
+    <span class="s">&#39;japanese&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s">&#39;sushi&#39;</span><span class="p">],</span>
+    <span class="s">&#39;turkish&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s">&#39;kebab&#39;</span><span class="p">],</span>
+    <span class="s">&#39;american&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s">&#39;steak_house&#39;</span><span class="p">]</span>
+  <span class="p">}</span>
+<span class="c"># not mapped:</span>
+<span class="c"># greek, asian, chinese, indian, international, vietnamese, thai, spanish, arabic</span>
+<span class="c"># sudanese, russian, korean, hungarian, syrian, vegan, soup, croatian, african</span>
+<span class="c"># balkan, mexican, french, cuban, lebanese</span>
+
+<span class="k">for</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">cuisines_synonyms</span><span class="p">:</span>
+  <span class="n">db</span><span class="o">.</span><span class="n">osmnodes</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="p">{</span>
+      <span class="s">&quot;cuisine&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;$exists&quot;</span><span class="p">:</span> <span class="bp">True</span><span class="p">},</span>
+      <span class="s">&quot;amenity&quot;</span><span class="p">:</span> <span class="s">&quot;restaurant&quot;</span><span class="p">,</span>
+      <span class="s">&quot;cuisineTags&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;$in&quot;</span><span class="p">:</span> <span class="n">cuisines_synonyms</span><span class="p">[</span><span class="n">target</span><span class="p">]}</span>
+    <span class="p">},</span> <span class="p">{</span>
+      <span class="s">&quot;$pullAll&quot;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&quot;cusineTags&quot;</span><span class="p">:</span> <span class="n">cuisines_synonyms</span><span class="p">[</span><span class="n">target</span><span class="p">]</span> <span class="p">},</span>
+      <span class="s">&quot;$addToSet&quot;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&quot;cuisineTags&quot;</span><span class="p">:</span> <span class="p">[</span> <span class="n">target</span> <span class="p">]</span> <span class="p">}</span>
+    <span class="p">},</span> <span class="n">multi</span><span class="o">=</span><span class="bp">False</span> <span class="p">)</span>
+</pre></div>
+</li>
+</ul>
+<p>This allows us to convert a restaurant with the MongoDB representation</p>
+<p><code>{..., "cuisine": "pizza;kebab", ...}</code></p>
+<p>to the alternative representation</p>
+<p><code>{..., "cuisine": "pizza;kebab", "cuisineTag": ["italian", "turkish"], ...}</code></p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Auditing-Phone-Numbers">Auditing Phone Numbers<a class="anchor-link" href="#Auditing-Phone-Numbers">&#182;</a></h3><p>Phone re scattered over different attributes (<code>address.phone</code>, <code>phone</code> and <code>mobile_phone</code>) and come in different styles of formating (like <code>+49 351 123 45</code> vs. <code>0049-351-12345</code>). First, we retrieve a list of all phone numbers. With the goal in mind to later store the normalized phone number back into the attribute <code>phone</code>, this value has to be read first, and only if it is empty, <code>mobile_phone</code> or <code>address.phone</code> should be used.</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[26]:</div>
+<div class="prompt input_prompt">In&nbsp;[24]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="kn">from</span> <span class="nn">Project.notebook_stub</span> <span class="kn">import</span> <span class="n">project_coll</span>
 
-<span class="c"># Query used - see function: Project.audit_quality_map.audit_streets(...):</span>
-<span class="n">expectedStreetPattern</span> <span class="o">=</span> \
-    <span class="s">u&quot;^.*(?&lt;![Ss]tra</span><span class="se">\u00df</span><span class="s">e)(?&lt;![Ww]eg)(?&lt;![Aa]llee)(?&lt;![Rr]ing)(?&lt;![Bb]erg)&quot;</span> <span class="o">+</span> \
-    <span class="s">u&quot;(?&lt;![Pp]ark)(?&lt;![Hh]</span><span class="se">\u00f6</span><span class="s">he)(?&lt;![Pp]latz)(?&lt;![Bb]r</span><span class="se">\u00fc</span><span class="s">cke)(?&lt;![Gg]rund)$&quot;</span>
-<span class="n">l</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">project_coll</span><span class="o">.</span><span class="n">distinct</span><span class="p">(</span><span class="s">&quot;name&quot;</span><span class="p">,</span> <span class="p">{</span>
-                    <span class="s">&quot;type&quot;</span><span class="p">:</span> <span class="s">&quot;way&quot;</span><span class="p">,</span>
-                    <span class="s">&quot;name&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;$regex&quot;</span><span class="p">:</span> <span class="n">expectedStreetPattern</span><span class="p">}</span>
-                <span class="p">}))</span>
-<span class="c"># Due to the excessive length of the output, I am not going to print the result. See the file Project/output_project.py_-q.txt</span>
+<span class="c"># Query used - see function: Project.audit_quality_map.audit_phone_numbers(...):</span>
+<span class="n">pipeline</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">{</span><span class="s">&quot;$match&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;$or&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="p">{</span><span class="s">&quot;phone&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;$exists&quot;</span><span class="p">:</span> <span class="bp">True</span><span class="p">}},</span>
+                <span class="p">{</span><span class="s">&quot;mobile_phone&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;$exists&quot;</span><span class="p">:</span> <span class="bp">True</span><span class="p">}},</span>
+                <span class="p">{</span><span class="s">&quot;address.phone&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;$exists&quot;</span><span class="p">:</span> <span class="bp">True</span><span class="p">}}</span>
+            <span class="p">]}},</span>
+        <span class="p">{</span><span class="s">&quot;$project&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s">&quot;_id&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                <span class="s">&quot;phone&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;$ifNull&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s">&quot;$phone&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s">&quot;$ifNull&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s">&quot;$mobile_phone&quot;</span><span class="p">,</span> <span class="s">&quot;$address.phone&quot;</span><span class="p">]}]}</span>
+            <span class="p">}}</span>
+    <span class="p">]</span>
+<span class="n">l</span> <span class="o">=</span> <span class="n">project_coll</span><span class="o">.</span><span class="n">aggregate</span><span class="p">(</span><span class="n">pipeline</span><span class="p">)</span>
+
+<span class="c"># Output too long... See the file Project/output_project.py_-q.txt</span>
 </pre></div>
 
 </div>
@@ -848,7 +866,34 @@ Usage:
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>The resulting list was skimmed through and no obvious candidates for cleaning were found. The list was, indeed, quite long. However, the nature of the german language (and how in Germany streetnames work) results in the fact, that there are many small places without a suffix like "street" but "their own thing" (like <code>Am Hang</code> lit. 'At The Slope', <code>Beerenhut</code> lit. 'Berry Hat', <code>Im Grunde</code> lit. 'In The Ground').</p>
+<h3 id="Cleaning-Phone-Numbers">Cleaning Phone Numbers<a class="anchor-link" href="#Cleaning-Phone-Numbers">&#182;</a></h3><p><strong>Try it out:</strong> Use <code>python project.py -C</code> to clean in debug mode. See Sample Output in file <code>Project/output_project.py_-C.txt</code>. The script also writes a CSV file to <a href="Project/data/clean_phones.csv"><code>Project/data/clean_phones.csv</code></a>, which is also beautified into a <a href="Project/data/clean_phones.xlsx">Excel File</a>.</p>
+<p>Cleaning the phone numbers involves:</p>
+<ul>
+<li>unifying the different phone attributes (<code>phone</code>, <code>address.phone</code> and <code>mobile_phone</code>) - this is already taken care by extracting the phone numbers during the audit stage</li>
+<li>if possible, canonicalizing the phone number notations by parsing them using a regular expression:</li>
+</ul>
+<div class="highlight"><pre><span class="n">phone_regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">ur&#39;^(\(?([\+|\*]|00) *(?P&lt;country&gt;[1-9][0-9]*)\)?)?&#39;</span> <span class="o">+</span>  <span class="c"># country code</span>
+                         <span class="s">ur&#39;[ \/\-\.]*\(?0?\)?[ \/\-\.]*&#39;</span> <span class="o">+</span>  <span class="c"># separator</span>
+                         <span class="s">ur&#39;(\(0?(?P&lt;area1&gt;[1-9][0-9 ]*)\)|0?(?P&lt;area2&gt;[1-9][0-9]*))?&#39;</span> <span class="o">+</span>  <span class="c"># area code</span>
+                         <span class="s">ur&#39;[ \/\-\.]*&#39;</span> <span class="o">+</span>  <span class="c"># separator</span>
+                         <span class="s">ur&#39;(?P&lt;number&gt;([0-9]+ *[\/\-.]? *)*)$&#39;</span><span class="p">,</span> <span class="c"># number</span>
+                         <span class="n">re</span><span class="o">.</span><span class="n">UNICODE</span><span class="p">)</span>
+</pre></div>
+<p>The regular expression is resilient to various separators ("<code>/</code>", "<code>-</code>", " ", "<code>(0)</code>") and bracket notation of phone numbers. It is not resilient for some unicode characters or written lists of phone numbers which are designed to be interpreted by humans (using separators like "<code>,</code>", "<code>/-</code>" or "<code>oder</code>" lit. or). During the cleaning stage, an output is written which phone numbers could not be parsed. This contains only a tiny fraction of phone numbers (9 or 0.5%) which would be easily cleanable by hand.</p>
+
+<pre><code>The following objects couldn't be parsed:
+                                                 normalized
+55f57294b1c8a72c34523897           +49 35207 81429 or 81469
+55f57299b1c8a72c345272cd  +49 351 8386837, +49 176 67032256
+55f572c2b1c8a72c34546689                      0351 4810426
+55f572c3b1c8a72c34546829         +49 351 8902284 or 2525375
+55f572fdb1c8a72c34574963   +49 351 4706625, +49 351 0350602
+55f573bdb1c8a72c3460bdb3                +49 351 87?44?44?00
+55f573bdb1c8a72c3460c066         0162 2648953, 0162 2439168
+55f573edb1c8a72c346304b1           03512038973, 03512015831
+55f5740eb1c8a72c34649008                0351 4455193 / -118</code></pre>
+<p>If the phone number was parsable, the country code, area code and rest of the phone number are separated and subsequently strung together to a canonical form. The data to be transformed is stored into a Pandas Dataframe. By using the option <code>-C</code> instead of <code>-c</code> the execution of the transformation can be surpressed and the Dataframe instead be written to a <a href="Project/data/clean_phones.csv">CSV file</a> which might be further beautified into an <a href="Project/data/clean_phones.xlsx">Excel File</a> in order to test or debug the transformation before writing it to the database with the <code>-c</code> option.</p>
+<p><img src="clean_phones.png" alt="A screenshot of the Excel file"></p>
 
 </div>
 </div>
@@ -858,18 +903,57 @@ Usage:
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Cross-Auditing-Street-Names-with-Street-Addresses">Cross Auditing Street Names with Street Addresses<a class="anchor-link" href="#Cross-Auditing-Street-Names-with-Street-Addresses">&#182;</a></h3><p>I did not want to trust the street names of the data set fully yet. Next, I tried figuring out if street names of buildings were consistent with street names of objects in close proximity. Therefore, a JavaScript query is run directly on the database server returning</p>
-<ul>
-<li>all street names (<code>address.street</code>) of buildings (elements, where attribute <code>buildings</code> exists) and which have an assigned position (<code>pos</code>) on the map</li>
-<li>with the computed value <code>nearby</code>, an array of <code>address.street</code> occurences, which is calculated by finding objects close to the current value using the <code>$near</code> operator</li>
-</ul>
+<h3 id="Auditing-Street-Names-(Spoiler-Alert:-No-Cleaning-Necessary)">Auditing Street Names (Spoiler Alert: No Cleaning Necessary)<a class="anchor-link" href="#Auditing-Street-Names-(Spoiler-Alert:-No-Cleaning-Necessary)">&#182;</a></h3><p>Auditing the map's street names analogous to how it was done in the Data Wrangling course was done as follows: Check, whether 'weird' street names occur, which do not end on a suffix like <code>street</code> (in German <code>-straße</code> or <code>Straße</code>, depending on whether it is a compound word or not). It is assumed that then, they would most likely end in an abbreviation like <code>str.</code>. For this we use a regular expression querying all streets <u>not</u> ending with a particular suffix like <code>[Ss]traße</code> (street), <code>[Ww]eg</code> (way) etc. This is accomplished by a chain of <a href="http://www.regular-expressions.info/lookaround.html">"negative lookbehind"</a> expressions (<code>(?&lt;!...)</code>) which must all in sequence evaluate to "true" in order to flag a street name as non-conforming.</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[30]:</div>
+<div class="prompt input_prompt">In&nbsp;[25]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span class="kn">from</span> <span class="nn">Project.notebook_stub</span> <span class="kn">import</span> <span class="n">project_coll</span>
+
+<span class="c"># Query used - see function: Project.audit_quality_map.audit_streets(...):</span>
+<span class="n">expectedStreetPattern</span> <span class="o">=</span> \
+    <span class="s">u&quot;^.*(?&lt;![Ss]tra</span><span class="se">\u00df</span><span class="s">e)(?&lt;![Ww]eg)(?&lt;![Aa]llee)(?&lt;![Rr]ing)(?&lt;![Bb]erg)&quot;</span> <span class="o">+</span> \
+    <span class="s">u&quot;(?&lt;![Pp]ark)(?&lt;![Hh]</span><span class="se">\u00f6</span><span class="s">he)(?&lt;![Pp]latz)(?&lt;![Bb]r</span><span class="se">\u00fc</span><span class="s">cke)(?&lt;![Gg]rund)$&quot;</span>
+<span class="n">l</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">project_coll</span><span class="o">.</span><span class="n">distinct</span><span class="p">(</span><span class="s">&quot;name&quot;</span><span class="p">,</span> <span class="p">{</span>
+                    <span class="s">&quot;type&quot;</span><span class="p">:</span> <span class="s">&quot;way&quot;</span><span class="p">,</span>
+                    <span class="s">&quot;name&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;$regex&quot;</span><span class="p">:</span> <span class="n">expectedStreetPattern</span><span class="p">}</span>
+                <span class="p">}))</span>
+<span class="c"># Output too long... See the file Project/output_project.py_-q.txt</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Skimming through the list, it was noticable that the nature of the german language (and how in Germany streetnames work) results in the fact, that there are many small places without a suffix like "street" but "their own thing" (like <code>Am Hang</code> lit. 'At The Slope', <code>Beerenhut</code> lit. 'Berry Hat', <code>Im Grunde</code> lit. 'In The Ground'). The street names can therefore not be processed just by looking at the suffixes - I tried something different...</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Cross-Auditing-Street-Names-with-Street-Addresses-(Spoiler-Alert:-No-Cleaning-Necessary)">Cross Auditing Street Names with Street Addresses (Spoiler Alert: No Cleaning Necessary)<a class="anchor-link" href="#Cross-Auditing-Street-Names-with-Street-Addresses-(Spoiler-Alert:-No-Cleaning-Necessary)">&#182;</a></h3><p>I did not want to trust the street names of the data set fully yet. Next, I tried figuring out if street names of buildings were consistent with street names of objects in close proximity. Therefore, a JavaScript query is run directly on the database server returning all <code>buildings</code> with the objects nearby having an <code>address.street</code> parameter. This should allow us to cross-audit if objects in close proximity do have the same street names.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[26]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="kn">from</span> <span class="nn">Project.notebook_stub</span> <span class="kn">import</span> <span class="n">project_db</span>
@@ -890,7 +974,7 @@ Usage:
 <span class="s">            return result;</span>
 <span class="s">        &#39;&#39;&#39;</span><span class="p">)</span>
 
-<span class="c"># Due to the excessive length of the output, I am not going to print the result. See the file Project/output_project.py_-q.txt</span>
+<span class="c"># Output too long... See the file Project/output_project.py_-q.txt</span>
 </pre></div>
 
 </div>
@@ -903,9 +987,9 @@ Usage:
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>The resulting objects are then iterated through and the best and worst fitting street name are identified each using the <a href="http://stackoverflow.com/questions/18134437/where-can-the-documentation-for-python-levenshtein-be-found-online">Levenshtein distance</a>. For each object, a row is created in a DataFrame which is subsequently exported to a csv file <a href="Project/data/audit_buildings.csv">Project/data/audit_buildings.csv</a> that was manually beautified into an <a href="Project/data/audit_buildings.xlsx">Excel File</a>.</p>
+<p>The resulting objects are then iterated through and the best and worst fitting nearby street name are identified each using the <a href="http://stackoverflow.com/questions/18134437/where-can-the-documentation-for-python-levenshtein-be-found-online">Levenshtein distance</a>. For each object, a row is created in a DataFrame which is subsequently exported to a csv file <a href="Project/data/audit_buildings.csv">Project/data/audit_buildings.csv</a> that was manually beautified into an <a href="Project/data/audit_buildings.xlsx">Excel File</a>.</p>
 <p><img src="audit_buildings.png" alt="Screenshot of the Excel File"></p>
-<p>As can be seen, street names of nearby objects mostly match those of the building itself (Levenshtein distance is zero). If they deviate greatly, they are totally different street names. There seem to be no cases of "typos" where a small Levenshtein distance of one to three is responsible for a different street name.</p>
+<p>As can be seen, street names of nearby objects mostly match those of the building itself (Levenshtein distance is zero). If they deviate greatly, they are totally different street names in the same area and not just "typos" or non-conforming abbreviations.</p>
 
 </div>
 </div>
@@ -915,35 +999,60 @@ Usage:
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Auditing-Phone-Numbers">Auditing Phone Numbers<a class="anchor-link" href="#Auditing-Phone-Numbers">&#182;</a></h3><p>I noticed early on, that the phone numbers of Point-of-Interests are scattered over different attributes (<code>address.phone</code>, <code>phone</code> and <code>mobile_phone</code>). Also, phone numbers can come in different styles of formating (like <code>+49 351 123 45</code> vs. <code>0049-351-12345</code>). To approach this cleaning task, I retrieved a list of all phone numbers. With the goal in mind to later store the normalized phone number back into the attribute <code>phone</code>, which was most widely used in the data set, I retrieved the value from this parameter first, and only if it was empty, I used the parameters <code>mobile_phone</code> or <code>address.phone</code>. The result of this query was processed further during the cleaning stage.</p>
+<h3 id="Auditing-Zip-Codes-(Spoiler-Alert:-No-Cleaning-Necessary)">Auditing Zip Codes (Spoiler Alert: No Cleaning Necessary)<a class="anchor-link" href="#Auditing-Zip-Codes-(Spoiler-Alert:-No-Cleaning-Necessary)">&#182;</a></h3><p><strong>Try it out:</strong> Use <code>python project.py -Z</code> which runs the auditing script for zipcodes. See Sample Output in file <code>Project/output_project.py_-Z.txt</code>. To be able to run this script correctly, the <a href="http://download.geonames.org/export/zip/">zipcode data from Geonames.org</a> needs to be downloaded  and installed first using the <code>-z</code> option (see output in <code>`Project/output_project.py_-Z.txt</code>).</p>
+<p>This part of the auditing process makes use of an additional at <a href="http://download.geonames.org/export/zip/">Geonames.org</a> to resolve and audit the zip codes in the data set. During the "installation process" (option <code>-z</code>) the zipcode data (provided as a tab-separated file) is downloaded and, line-by-line, stored to a (separate) MongoDB collection. However, we are only interested "zipcode" (2) and  "place" (3)</p>
+<p>During the auditing stage (option <code>-Z</code>) we first get a list of all used zipcode using the following query:</p>
+<div class="highlight"><pre><span class="n">pipeline</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">{</span> <span class="s">&quot;$match&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;address.postcode&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;$exists&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}}</span> <span class="p">},</span>
+            <span class="p">{</span> <span class="s">&quot;$group&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;_id&quot;</span><span class="p">:</span> <span class="s">&quot;$address.postcode&quot;</span><span class="p">,</span> <span class="s">&quot;count&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;$sum&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}}</span> <span class="p">},</span>
+            <span class="p">{</span> <span class="s">&quot;$sort&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;count&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span> <span class="p">}</span>
+        <span class="p">]</span>
+</pre></div>
+<p>The zipcodes are then all looked up in the zipcode collection using the <code>$in</code>-operator. The data obtained is joined back into the original result.</p>
+<div class="highlight"><pre><span class="n">zipcodeObjects</span> <span class="o">=</span> <span class="n">zipcodeColl</span><span class="o">.</span><span class="n">find</span><span class="p">(</span> <span class="p">{</span><span class="s">&quot;zipcode&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;$in&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">z</span><span class="p">[</span><span class="s">&quot;_id&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">zipcodeList</span><span class="p">]}}</span> <span class="p">)</span>
+</pre></div>
+<p>The following output shows that there the lesser used zipcodes are from the Dresden metropolitan area, not Dresden itself:</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[33]:</div>
+<div class="prompt input_prompt">In&nbsp;[27]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span class="kn">from</span> <span class="nn">Project.notebook_stub</span> <span class="kn">import</span> <span class="n">project_coll</span>
+<div class=" highlight hl-ipython2"><pre><span class="kn">from</span> <span class="nn">Project.audit_zipcode_map</span> <span class="kn">import</span> <span class="n">audit_zipcode_map</span>
+<span class="kn">from</span> <span class="nn">Project.notebook_stub</span> <span class="kn">import</span> <span class="n">project_server</span><span class="p">,</span> <span class="n">project_port</span>
+<span class="kn">import</span> <span class="nn">pprint</span>
 
-<span class="c"># Query used - see function: Project.audit_quality_map.audit_phone_numbers(...):</span>
-<span class="n">l</span> <span class="o">=</span> <span class="n">project_coll</span><span class="o">.</span><span class="n">aggregate</span><span class="p">([</span>
-        <span class="p">{</span><span class="s">&quot;$match&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;$or&quot;</span><span class="p">:</span> <span class="p">[</span>
-            <span class="p">{</span><span class="s">&quot;phone&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;$exists&quot;</span><span class="p">:</span> <span class="bp">True</span><span class="p">}},</span>
-            <span class="p">{</span><span class="s">&quot;mobile_phone&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;$exists&quot;</span><span class="p">:</span> <span class="bp">True</span><span class="p">}},</span>
-            <span class="p">{</span><span class="s">&quot;address.phone&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;$exists&quot;</span><span class="p">:</span> <span class="bp">True</span><span class="p">}}</span>
-          <span class="p">]}},</span>
-        <span class="p">{</span><span class="s">&quot;$project&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s">&quot;_id&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-            <span class="s">&quot;phone&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;$ifNull&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s">&quot;$phone&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s">&quot;$ifNull&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s">&quot;$mobile_phone&quot;</span><span class="p">,</span> <span class="s">&quot;$address.phone&quot;</span><span class="p">]}]}</span>
-          <span class="p">}}</span>
-      <span class="p">])</span>
-
-<span class="c"># Due to the excessive length of the output, I am not going to print the result. See the file Project/output_project.py_-q.txt</span>
+<span class="n">zipcodeJoined</span> <span class="o">=</span> <span class="n">audit_zipcode_map</span><span class="p">(</span><span class="n">project_server</span><span class="p">,</span> <span class="n">project_port</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">zipcodeJoined</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">10</span><span class="p">]</span><span class="o">+</span><span class="p">[</span><span class="s">&#39;...&#39;</span><span class="p">])</span>
 </pre></div>
 
 </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[{u&apos;_id&apos;: u&apos;01847&apos;, u&apos;count&apos;: 2, &apos;place&apos;: u&apos;Lohmen&apos;},
+ {u&apos;_id&apos;: u&apos;01896&apos;, u&apos;count&apos;: 17, &apos;place&apos;: u&apos;Pulsnitz&apos;},
+ {u&apos;_id&apos;: u&apos;01665&apos;, u&apos;count&apos;: 18, &apos;place&apos;: u&apos;Diera-Zehren&apos;},
+ {u&apos;_id&apos;: u&apos;01689&apos;, u&apos;count&apos;: 63, &apos;place&apos;: u&apos;Weinb\xf6hla&apos;},
+ {u&apos;_id&apos;: u&apos;01833&apos;, u&apos;count&apos;: 93, &apos;place&apos;: u&apos;Stolpen&apos;},
+ {u&apos;_id&apos;: u&apos;01477&apos;, u&apos;count&apos;: 134, &apos;place&apos;: u&apos;Arnsdorf&apos;},
+ {u&apos;_id&apos;: u&apos;01737&apos;, u&apos;count&apos;: 165, &apos;place&apos;: u&apos;Tharandt&apos;},
+ {u&apos;_id&apos;: u&apos;01471&apos;, u&apos;count&apos;: 325, &apos;place&apos;: u&apos;Radeburg&apos;},
+ {u&apos;_id&apos;: u&apos;01796&apos;, u&apos;count&apos;: 516, &apos;place&apos;: u&apos;Pirna&apos;},
+ &apos;...&apos;]
+</pre>
+</div>
+</div>
+
 </div>
 </div>
 
@@ -953,57 +1062,21 @@ Usage:
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Cleaning-Phone-Numbers">Cleaning Phone Numbers<a class="anchor-link" href="#Cleaning-Phone-Numbers">&#182;</a></h2><p><strong>Note:</strong> The information gained in this chapter can be queried using the project script with the <code>-C</code> option which runs the cleaning script in debug mode. See Sample Output in file <code>Project/output_project.py_-C.txt</code>. The script also writes a CSV file to <a href="Project/data/clean_phones.csv"><code>Project/data/clean_phones.csv</code></a>, which is also beautified into a <a href="Project/data/clean_phones.xlsx">Excel File</a>.</p>
-<p>Cleaning the phone numbers involves:</p>
+<h2 id="Other-Ideas-about-the-Data-Set">Other Ideas about the Data Set<a class="anchor-link" href="#Other-Ideas-about-the-Data-Set">&#182;</a></h2><h3 id="Auditing-City-Names-for-Correctness-and-Completeness">Auditing City Names for Correctness and Completeness<a class="anchor-link" href="#Auditing-City-Names-for-Correctness-and-Completeness">&#182;</a></h3><p>The Geonames.org data could help us to validate the entered city names or add them, where missing. One could compare the <code>address.city</code> attribute of any OSM element with all of the 4 hierarchically names of the Geonames.org document which belongs to the zipcode referred by <code>address.postcode</code>.</p>
 <ul>
-<li>unifying the different phone attributes (<code>phone</code>, <code>address.phone</code> and <code>mobile_phone</code>) - this is already taken care by extracting the phone numbers during the audit stage</li>
-<li>if possible, canonicalizing the phone number notations by parsing them using a regular expression:</li>
+<li>If no <code>address.city</code> is present in the OSM element at all, the lowestmost value in the Geonames.org hieararchy could be added and the data therefore enhanced.</li>
+<li>If the value of the OSM element does not match any name of the Geonames.org data, the element could be flagged for manual processing.</li>
 </ul>
-<div class="highlight"><pre><span class="n">phone_regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">ur&#39;^(\(?([\+|\*]|00) *(?P&lt;country&gt;[1-9][0-9]*)\)?)?&#39;</span> <span class="o">+</span>  <span class="c"># country code</span>
-                         <span class="s">ur&#39;[ \/\-\.]*\(?0?\)?[ \/\-\.]*&#39;</span> <span class="o">+</span>  <span class="c"># separator</span>
-                         <span class="s">ur&#39;(\(0?(?P&lt;area1&gt;[1-9][0-9 ]*)\)|0?(?P&lt;area2&gt;[1-9][0-9]*))?&#39;</span> <span class="o">+</span>  <span class="c"># area code</span>
-                         <span class="s">ur&#39;[ \/\-\.]*&#39;</span> <span class="o">+</span>  <span class="c"># separator</span>
-                         <span class="s">ur&#39;(?P&lt;number&gt;([0-9]+ *[\/\-.]? *)*)$&#39;</span><span class="p">,</span> <span class="c"># number</span>
-                         <span class="n">re</span><span class="o">.</span><span class="n">UNICODE</span><span class="p">)</span>
-</pre></div>
-<p>This regular expression was carefully rasped on the <a href="https://regex101.com/">regex101.com online tool</a> by importing the phone numbers as test dataset.</p>
-<p><img src="clean_regex101.png" alt="A screenshot about regex101.com"></p>
-<p>The regular expression is resilient to various separators ("<code>/</code>", "<code>-</code>", " ", "<code>(0)</code>") and bracket notation of phone numbers. It is not resilient for some unicode characters or written lists of phone numbers which are designed to be interpreted by humans (using separators like "<code>,</code>", "<code>/-</code>" or "<code>oder</code>" lit. or). During the cleaning stage, an output is written which phone numbers could not be parsed. This contains only a tiny fraction of phone numbers (9 or 0.5%) which would be easily cleanable by hand.</p>
-
-<pre><code>The following objects couldn't be parsed:
-                                                 normalized
-55f57294b1c8a72c34523897           +49 35207 81429 or 81469
-55f57299b1c8a72c345272cd  +49 351 8386837, +49 176 67032256
-55f572c2b1c8a72c34546689                      0351 4810426
-55f572c3b1c8a72c34546829         +49 351 8902284 or 2525375
-55f572fdb1c8a72c34574963   +49 351 4706625, +49 351 0350602
-55f573bdb1c8a72c3460bdb3                +49 351 87?44?44?00
-55f573bdb1c8a72c3460c066         0162 2648953, 0162 2439168
-55f573edb1c8a72c346304b1           03512038973, 03512015831
-55f5740eb1c8a72c34649008                0351 4455193 / -118</code></pre>
-<p>If the phone number was parsable, the country code, area code and rest of the phone number are separated and subsequently strung together to a canonical form using the following guidelines:</p>
+<p><strong>Cost</strong>: Relatively easily implementable, however, out of scope for this project. We should, however, strive for implementing the related query in native BSON code in order to not hit the database with every zipcode-to-Geonames-element mapping request for each OSM element.</p>
+<p><strong>Benefit</strong>: Potentially high, depending on how many cities are not entered at all (quick win) or entered correctly (some additional manual work required).</p>
+<h3 id="Cuisine-Taxonomy">Cuisine Taxonomy<a class="anchor-link" href="#Cuisine-Taxonomy">&#182;</a></h3><p>The taxonomy of cuisines could be further formalized to contain super- and subsets of cuisines (e.g. each "italian" cuisine is also an "international" cuisine). With domain knowledge, coarsly classified restaurants could potentially also be sub-classified.</p>
+<p><strong>Cost</strong>: High, The creation of a proper cuisine-taxonomy would require substantial knowledge of the subject matter of cuisines and the subtle differences in culinary art. Also, rather than a tree-based classification, some "fusion" kitchens might overlap:  any simplification or unification we carry out here comes at the cost of sacrificing detail.</p>
+<p><strong>Benefit</strong>: Medium-high in certain use cases, higher number of restaurants with a certain classification lets us better find the restaurant of our taste and compare various restaurants with each other.</p>
+<h3 id="Other-Open-Questions">Other Open Questions<a class="anchor-link" href="#Other-Open-Questions">&#182;</a></h3><p>Overall, the data set of Dresden is pretty neat and tidy. Compared to other, huger cities (e.g., in India) I might have had an easier job. Further open questions or ideas (out of scope for this report) include:</p>
 <ul>
-<li>The country code (<code>country</code>) is preceded with a "+"</li>
-<li>The area code (<code>area1</code> or <code>area2</code> - whichever is set) is preceded with a "0" if the country code is not present</li>
-<li>Country code, area code and rest of the number (<code>number</code>) are concatenated by " " as a separator</li>
-</ul>
-<p>The data to be transformed is stored into a Pandas Dataframe. By using the option <code>-C</code> instead of <code>-c</code> the execution of the transformation can be surpressed and the Dataframe instead be written to a <a href="Project/data/clean_phones.csv">CSV file</a> which might be further beautified into an <a href="Project/data/clean_phones.xlsx">Excel File</a> in order to test or debug the transformation before writing it to the database with the <code>-c</code> option.</p>
-<p><img src="clean_phones.png" alt="A screenshot of the Excel file"></p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Conclusion-and-Further-Ideas">Conclusion and Further Ideas<a class="anchor-link" href="#Conclusion-and-Further-Ideas">&#182;</a></h2><p>Overall, the data set of Dresden is pretty neat and tidy. Compared to other, huger cities (e.g., in India), it dawned me when I looked at the Udacity forums, that I had an easier job. There are certainly some other ideas one could venture into:</p>
-<ul>
-<li>The users might be analyzed further: Why are so many nodes (many thousands) created by so few users? Are bots at work?</li>
-<li>Auditing for completeness would be another challenge: Here, we would need another data set as a "gold standard". One could parse several websites for Dresdens street names and test, whether they are present in the data set.</li>
-<li>The report also hints at the possibility to formalize the taxonomy of restaurant cuisines and use a more strict classification method of cuisines. However, areas of art (be it culinary, musical or otherwise) sometimes resist strict classification.</li>
-<li>One could, of course, feed the normalized phone data back into Open Street Map by either using a Web Service or using the XML format.</li>
+<li>The users might be analyzed further: Why are so many nodes (many thousands) created by so few users? Are bots at work? Why are so many users only contributing with very few edits? (Maybe gamification - leaderboards for who has the most edits during the recent week - would provide help.)</li>
+<li>One could audit for completeness by parsing several sample websites for addresses and trying to retrieve those addresses in the Open Street Map data.</li>
+<li>One could feed the normalized phone data back into Open Street Map by either using a Web Service or using the XML format.</li>
 </ul>
 
 </div>
@@ -1030,6 +1103,7 @@ Usage:
 <li><a href="http://docs.mongodb.org/master/reference/mongodb-extended-json/">MongoDB Extended JSON</a></li>
 <li><a href="http://stackoverflow.com/questions/22676/how-do-i-download-a-file-over-http-using-python">Retrieving URLs</a></li>
 <li><a href="http://stackoverflow.com/questions/18134437/where-can-the-documentation-for-python-levenshtein-be-found-online">Using the Levenshtein distance</a></li>
+<li><a href="http://download.geonames.org/export/zip/">Zipcode Helper from Geonames.org</a> (<a href="http://www.geonames.org/export/">cc-by</a>)</li>
 </ul>
 
 </div>

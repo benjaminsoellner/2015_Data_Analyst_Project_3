@@ -92,3 +92,4 @@ def audit_quality_map(mongoServer, mongoPort, csvFilePattern, csvEncoding):
     print "Auditing phone numbers..."
     r = audit_phone_numbers(c)
     pprint.pprint(r)
+    
